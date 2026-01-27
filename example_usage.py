@@ -35,12 +35,92 @@ def main() -> None:
     print("-" * 80)
 
     # Create client with default determinism level (3 - balanced)
-    client = MistralAIClient(api_key=api_key)
+    client = MistralAIClient(api_key=api_key, model="mistral-large-latest")
     print(f"🤖 Connected to Mistral AI with model: {client.model}")
     print(
         f"🎛️  Default determinism level: {client.determinism_level} ({client.determinism_controller.get_level_description()})"
     )
-    print("-" * 60)
+    print("-" * 80)
+
+    # Create client with specific determinism level
+    exact_client = MistralAIClient(
+        api_key=api_key, model="mistral-large-latest", determinism_level=1
+    )
+    print(
+        f"🎛️  Exact client level: {exact_client.determinism_level} ({exact_client.determinism_controller.get_level_description()})"
+    )
+
+    # Create client with different model and determinism level
+    creative_client = MistralAIClient(
+        api_key=api_key, model="mistral-large-latest", determinism_level=5
+    )
+    print(
+        f"🎨 Creative client: model={creative_client.model}, level={creative_client.determinism_level}"
+    )
+    print(
+        f"  Description: {creative_client.determinism_controller.get_level_description()}"
+    )
+    print("-" * 80)
+
+    # Create client with specific determinism level
+    exact_client = MistralAIClient(
+        api_key=api_key, model="mistral-medium-2508", determinism_level=1
+    )
+    print(
+        f"🎛️  Exact client level: {exact_client.determinism_level} ({exact_client.determinism_controller.get_level_description()})"
+    )
+
+    # Create client with different model and determinism level
+    creative_client = MistralAIClient(
+        api_key=api_key, model="mistral-medium-2508", determinism_level=5
+    )
+    print(
+        f"🎨 Creative client: model={creative_client.model}, level={creative_client.determinism_level}"
+    )
+    print(
+        f"  Description: {creative_client.determinism_controller.get_level_description()}"
+    )
+    print("-" * 80)
+
+    # Create client with specific determinism level
+    exact_client = MistralAIClient(
+        api_key=api_key, model="mistral-tiny", determinism_level=1
+    )
+    print(
+        f"🎛️  Exact client level: {exact_client.determinism_level} ({exact_client.determinism_controller.get_level_description()})"
+    )
+
+    # Create client with different model and determinism level
+    creative_client = MistralAIClient(
+        api_key=api_key, model="mistral-tiny", determinism_level=5
+    )
+    print(
+        f"🎨 Creative client: model={creative_client.model}, level={creative_client.determinism_level}"
+    )
+    print(
+        f"  Description: {creative_client.determinism_controller.get_level_description()}"
+    )
+    print("-" * 80)
+
+    # Create client with specific determinism level
+    exact_client = MistralAIClient(
+        api_key=api_key, model="mistral-medium-latest", determinism_level=1
+    )
+    print(
+        f"🎛️  Exact client level: {exact_client.determinism_level} ({exact_client.determinism_controller.get_level_description()})"
+    )
+
+    # Create client with different model and determinism level
+    creative_client = MistralAIClient(
+        api_key=api_key, model="mistral-medium-latest", determinism_level=5
+    )
+    print(
+        f"🎨 Creative client: model={creative_client.model}, level={creative_client.determinism_level}"
+    )
+    print(
+        f"  Description: {creative_client.determinism_controller.get_level_description()}"
+    )
+    print("-" * 80)
 
     # Create client with specific determinism level
     exact_client = MistralAIClient(api_key=api_key, determinism_level=1)
@@ -105,19 +185,40 @@ def main() -> None:
     ]
     print(f"💬 System: {balanced_messages[0]['content']}")
     print(f"💬 User: {balanced_messages[1]['content']}")
+    print("🔄 Processing request...")
     try:
         balanced_response = client.chat_completion(balanced_messages)
-        wrapped_response = textwrap.fill(
-            balanced_response, width=80, subsequent_indent="    "
-        )
-        print(f"💬 Balanced response: {wrapped_response}")
+        if balanced_response:
+            wrapped_response = textwrap.fill(
+                balanced_response, width=80, subsequent_indent="    "
+            )
+            print(f"💬 Balanced response: {wrapped_response}")
+        else:
+            print("⚠️  Empty response received from API")
     except Exception as e:
         print(f"❌ Error with balanced client: {e}")
+        print("💡 Trying with default model as fallback...")
+        # Try with default model
+        fallback_client = MistralAIClient(api_key=api_key)
+        try:
+            balanced_response = fallback_client.chat_completion(balanced_messages)
+            if balanced_response:
+                wrapped_response = textwrap.fill(
+                    balanced_response, width=80, subsequent_indent="    "
+                )
+                print(f"💬 Balanced response (fallback): {wrapped_response}")
+            else:
+                print("⚠️  Empty response received from fallback API")
+        except Exception as fallback_e:
+            print(f"❌ Error with fallback client: {fallback_e}")
+            print("🔴 Unable to complete balanced client test")
 
     # Test with focused client (level 2)
     print("\n🔍 Testing focused client (level 2):")
     print("-" * 80)
-    focused_client = MistralAIClient(api_key=api_key, determinism_level=2)
+    focused_client = MistralAIClient(
+        api_key=api_key, model="mistral-large-latest", determinism_level=2
+    )
     focused_messages = [
         {"role": "system", "content": "You are a focused AI assistant."},
         {"role": "user", "content": "Explain the French Revolution briefly."},
