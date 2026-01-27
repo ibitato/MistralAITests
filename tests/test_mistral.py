@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from src.determinism_controller import DeterminismController
 from src.mistral_client import MistralAIClient
 from src.utils import format_chat_message, truncate_text, validate_api_key
 
@@ -61,6 +62,122 @@ class TestMistralAIClient:
         result = client.chat_completion(messages)
         assert result == "Hello, World!"
         mock_instance.chat.complete.assert_called_once()
+
+    def test_chat_completion_with_determinism_level(self, mock_client):
+        """Test chat completion with different determinism levels."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+
+        # Mock response
+        mock_response = MagicMock()
+        mock_message = MagicMock()
+        mock_message.content = "Deterministic response"
+        mock_choice = MagicMock()
+        mock_choice.message = mock_message
+        mock_response.choices = [mock_choice]
+        mock_instance.chat.complete.return_value = mock_response
+
+        client = MistralAIClient(api_key="test_key")
+        messages = [{"role": "user", "content": "Test"}]
+
+        # Test level 1 (most exact)
+        result = client.chat_completion(messages, determinism_level=1)
+        assert result == "Deterministic response"
+
+        # Test level 5 (most creative)
+        result = client.chat_completion(messages, determinism_level=5)
+        assert result == "Deterministic response"
+
+    def test_determinism_controller(self):
+        """Test determinism controller levels."""
+        # Test level 1 (most exact) - Note: top_p=1.0 for Mistral API compatibility with greedy sampling
+        controller = DeterminismController(level=1)
+        params = controller.get_parameters()
+        assert params["temperature"] == 0.0
+        assert (
+            params["top_p"] == 1.0
+        )  # Mistral API requires top_p=1 when using greedy sampling
+
+        # Test level 3 (balanced - default)
+        controller = DeterminismController(level=3)
+        params = controller.get_parameters()
+        assert params["temperature"] == 0.3
+        assert params["top_p"] == 0.5
+
+        # Test level 5 (most creative)
+        controller = DeterminismController(level=5)
+        params = controller.get_parameters()
+        assert params["temperature"] == 0.7
+        assert params["top_p"] == 0.9
+
+    def test_determinism_controller_invalid_level(self):
+        """Test determinism controller with invalid level."""
+        with pytest.raises(ValueError):
+            DeterminismController(level=0)
+
+        with pytest.raises(ValueError):
+            DeterminismController(level=6)
+
+    def test_temperature_override_with_greedy_sampling(self, mock_client):
+        """Test temperature override logic with greedy sampling (temperature=0.0)."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+
+        # Mock response
+        mock_response = MagicMock()
+        mock_message = MagicMock()
+        mock_message.content = "Exact response"
+        mock_choice = MagicMock()
+        mock_choice.message = mock_message
+        mock_response.choices = [mock_choice]
+        mock_instance.chat.complete.return_value = mock_response
+
+        client = MistralAIClient(api_key="test_key")
+        messages = [{"role": "user", "content": "Test"}]
+
+        # Test temperature=0.0 override (should set top_p=1.0 for Mistral API compatibility)
+        result = client.chat_completion(messages, temperature=0.0)
+        assert result == "Exact response"
+
+        # Verify that the call included top_p=1.0 when temperature=0.0
+        call_args = mock_instance.chat.complete.call_args
+        assert call_args[1]["temperature"] == 0.0
+        assert call_args[1]["top_p"] == 1.0
+
+    def test_dynamic_level_switching(self, mock_client):
+        """Test dynamic determinism level switching during runtime."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+
+        # Mock response
+        mock_response = MagicMock()
+        mock_message = MagicMock()
+        mock_message.content = "Dynamic response"
+        mock_choice = MagicMock()
+        mock_choice.message = mock_message
+        mock_response.choices = [mock_choice]
+        mock_instance.chat.complete.return_value = mock_response
+
+        client = MistralAIClient(api_key="test_key", determinism_level=3)
+        messages = [{"role": "user", "content": "Test"}]
+
+        # Test initial level (3)
+        result = client.chat_completion(messages)
+        assert result == "Dynamic response"
+
+        # Verify initial level parameters
+        call_args = mock_instance.chat.complete.call_args
+        assert call_args[1]["temperature"] == 0.3
+        assert call_args[1]["top_p"] == 0.5
+
+        # Test switching to level 2
+        result = client.chat_completion(messages, determinism_level=2)
+        assert result == "Dynamic response"
+
+        # Verify level 2 parameters
+        call_args = mock_instance.chat.complete.call_args
+        assert call_args[1]["temperature"] == 0.1
+        assert call_args[1]["top_p"] == 0.2
 
 
 class TestUtils:

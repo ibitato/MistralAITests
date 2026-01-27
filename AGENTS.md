@@ -2,6 +2,12 @@
 
 This document provides comprehensive guidelines for AI agents (like opencode) operating in this Mistral AI test project repository.
 
+## Important Project Rules
+
+1. **Always use the virtual environment**: This project requires using the virtual environment for all Python operations. Always activate the venv before running any commands.
+2. **Never use system Python**: Always use `python3` from the virtual environment, never the system Python.
+3. **Follow the build commands**: Use the commands specified in the Build/Lint/Test Commands section below.
+
 ## Build/Lint/Test Commands
 
 ### Environment Setup
