@@ -8,8 +8,8 @@ import textwrap
 
 from dotenv import load_dotenv
 
-# Add the src directory to the Python path
-sys.path.insert(0, os.path.dirname(__file__))
+# Add the parent directory to the Python path to access src modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from determinism_controller import DeterminismController
 from mistral_client import MistralAIClient
