@@ -41,11 +41,11 @@ def test_mistral_medium() -> bool:
         print(f"🔄 Testing model: {model}")
 
         from mistralai.models import UserMessage
-        
+
         messages = [
             UserMessage(role="user", content="What is the best French cheese?"),
         ]
-        
+
         chat_response = client.chat.complete(
             model=model,
             messages=messages,  # type: ignore

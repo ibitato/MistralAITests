@@ -1,12 +1,12 @@
-# 🔌 Integración con Mistral AI API
+# 🔌 Integration con Mistral AI API
 
-## 🎯 Visión General
+## 🎯 Overview
 
 Este documento detalla cómo el sistema se integra con la API de Mistral AI, incluyendo endpoints, autenticación, manejo de errores y mejores prácticas.
 
 ## 📡 Autenticación
 
-### Configuración de API Key
+### Configuration de API Key
 
 ```python
 # Desde variables de entorno
@@ -16,7 +16,7 @@ import os
 load_dotenv()
 api_key = os.getenv("MISTRAL_AI_API_KEY")
 
-# Validación
+# Validation
 from utils import validate_api_key
 if not validate_api_key(api_key):
     raise ValueError("Invalid API key")
@@ -29,8 +29,8 @@ client = MistralAIClient(api_key=api_key)
 
 - **Longitud**: 32-64 caracteres
 - **Formato**: Alfanumérico con guiones
-- **Ejemplo**: `sk-1234567890abcdef1234567890abcdef`
-- **Almacenamiento**: Variable de entorno (NUNCA en código)
+- **Example**: `sk-1234567890abcdef1234567890abcdef`
+- **Storage**: Variable de entorno (NUNCA en código)
 
 ## 📋 Endpoints de la API
 
@@ -38,7 +38,7 @@ client = MistralAIClient(api_key=api_key)
 
 **Endpoint**: `POST https://api.mistral.ai/v1/chat/completions`
 
-**Parámetros:**
+**Parameters:**
 
 ```json
 {
@@ -55,7 +55,7 @@ client = MistralAIClient(api_key=api_key)
 }
 ```
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -81,7 +81,7 @@ client = MistralAIClient(api_key=api_key)
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 from mistral_client import MistralAIClient
@@ -91,7 +91,7 @@ messages = [
     {"role": "user", "content": "What is the capital of France?"}
 ]
 
-# Respuesta completa
+# Response completa
 response = client.chat_completion(messages)
 print(response)
 
@@ -104,7 +104,7 @@ for chunk in client.chat_completion_stream(messages):
 
 **Endpoint**: `POST https://api.mistral.ai/v1/files`
 
-**Parámetros:**
+**Parameters:**
 
 ```json
 {
@@ -116,7 +116,7 @@ for chunk in client.chat_completion_stream(messages):
 }
 ```
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -133,7 +133,7 @@ for chunk in client.chat_completion_stream(messages):
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 from document_manager import DocumentManager
@@ -147,13 +147,13 @@ print(f"File ID: {file_info.id}")
 
 **Endpoint**: `GET https://api.mistral.ai/v1/files`
 
-**Parámetros:**
+**Parameters:**
 
 - `page`: Número de página (default: 0)
 - `page_size`: Tamaño de página (default: 100)
 - `include_total`: Incluir total de documentos
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -176,7 +176,7 @@ print(f"File ID: {file_info.id}")
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 documents = doc_manager.list_documents()
@@ -188,7 +188,7 @@ for doc in documents.data:
 
 **Endpoint**: `GET https://api.mistral.ai/v1/files/{file_id}`
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -206,7 +206,7 @@ for doc in documents.data:
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 doc_info = doc_manager.get_document_info("file-123")
@@ -217,7 +217,7 @@ print(f"File: {doc_info.filename}, Size: {doc_info.bytes} bytes")
 
 **Endpoint**: `DELETE https://api.mistral.ai/v1/files/{file_id}`
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -227,7 +227,7 @@ print(f"File: {doc_info.filename}, Size: {doc_info.bytes} bytes")
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 success = doc_manager.delete_document("file-123")
@@ -239,11 +239,11 @@ if success:
 
 **Endpoint**: `GET https://api.mistral.ai/v1/files/{file_id}/url`
 
-**Parámetros:**
+**Parameters:**
 
 - `expiry`: Horas antes de que expire la URL (default: 24)
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -251,7 +251,7 @@ if success:
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 signed_url = doc_manager.get_signed_url("file-123", expiry_hours=12)
@@ -262,7 +262,7 @@ print(f"Signed URL: {signed_url}")
 
 **Endpoint**: `GET https://api.mistral.ai/v1/models`
 
-**Respuesta:**
+**Response:**
 
 ```json
 {
@@ -284,7 +284,7 @@ print(f"Signed URL: {signed_url}")
 }
 ```
 
-**Implementación:**
+**Implementation:**
 
 ```python
 models = client.list_models()
@@ -292,9 +292,9 @@ for model in models:
     print(model.id)
 ```
 
-## 🔄 Document QnA con Archivos
+## 🔄 Document QnA con Files
 
-### Formato de Mensajes
+### Formato de Messages
 
 Para usar documentos subidos en chat completions:
 
@@ -313,15 +313,15 @@ Para usar documentos subidos en chat completions:
 }
 ```
 
-**Tipos de contenido soportados:**
+**Types de contenido soportados:**
 
-1. **`text`**: Texto simple
+1. **`text`**: Text simple
 2. **`file_id`**: ID de archivo subido (deprecated, usar `file`)
 3. **`file`**: ID de archivo subido (recomendado)
 4. **`document_url`**: URL pública de documento
 5. **`image_url`**: URL de imagen
 
-### Implementación Completa
+### Implementation Completa
 
 ```python
 # 1. Subir documento
@@ -380,20 +380,20 @@ print(f"Tokens/second: {metrics['metrics']['tokens_per_second']:.1f}")
 }
 ```
 
-## ⚠️ Manejo de Errores
+## ⚠️ Handling de Errors
 
-### Errores Comunes y Soluciones
+### Errors Comunes y Soluciones
 
-| Código de Error | Tipo | Causa | Solución |
+| Code de Error | Type | Causa | Solución |
 |----------------|------|-------|----------|
 | 401 | Unauthorized | API Key inválida | Verificar API Key en `.env` |
-| 404 | Not Found | Recurso no encontrado | Verificar IDs y endpoints |
+| 404 | Not Found | Resource no encontrado | Verificar IDs y endpoints |
 | 429 | Too Many Requests | Límite de tasa excedido | Implementar retry con backoff |
 | 500 | Internal Server Error | Error del servidor | Reintentar más tarde |
-| 413 | Payload Too Large | Archivo demasiado grande | Usar archivos < 512MB |
-| 400 | Bad Request | Parámetros inválidos | Validar entrada |
+| 413 | Payload Too Large | File demasiado grande | Usar archivos < 512MB |
+| 400 | Bad Request | Parameters inválidos | Validar entrada |
 
-### Implementación de Manejo de Errores
+### Implementation de Handling de Errors
 
 ```python
 try:
@@ -438,12 +438,12 @@ def chat_with_retry(client, messages, max_retries=3):
    - Usar variables de entorno
    - Rotación periódica
 
-2. **Validación de Entrada**:
+2. **Validation de Input**:
    - Validar todos los parámetros
    - Limitar tamaño de archivos
    - Validar formatos
 
-3. **Manejo de Errores**:
+3. **Handling de Errors**:
    - No exponer información sensible
    - Logging seguro
    - Recuperación graceful
@@ -453,7 +453,7 @@ def chat_with_retry(client, messages, max_retries=3):
    - Monitorear uso de cuota
    - Alertas tempranas
 
-### Ejemplo de Validación
+### Example de Validation
 
 ```python
 def validate_api_key(api_key):
@@ -481,7 +481,7 @@ def validate_api_key(api_key):
    - Usar `temperature` adecuada
    - Optimizar prompts
 
-3. **Cache de Respuestas**:
+3. **Cache de Responses**:
    - Cachear respuestas frecuentes
    - Usar TTL adecuado
    - Invalidar cache cuando sea necesario
@@ -496,21 +496,21 @@ def validate_api_key(api_key):
 2. **Procesamiento por Lotes**:
    - Múltiples preguntas en un solo request
    - Procesamiento paralelo
-   - Reducir latencia
+   - Networkucir latencia
 
 3. **Compresión**:
    - Comprimir documentos grandes
    - Usar formatos eficientes
    - Optimizar tamaño de payload
 
-## 📚 Ejemplos de Integración
+## 📚 Examples de Integration
 
-### 1. Integración Básica
+### 1. Integration Básica
 
 ```python
 from mistral_client import MistralAIClient
 
-# Configuración
+# Configuration
 client = MistralAIClient(
     api_key="tu_api_key",
     model="mistral-small-latest",
@@ -523,7 +523,7 @@ response = client.chat_completion(messages)
 print(response)
 ```
 
-### 2. Integración con Documentos
+### 2. Integration con Documents
 
 ```python
 from document_manager import DocumentManager
@@ -551,7 +551,7 @@ print(response)
 doc_manager.delete_document(file_info.id)
 ```
 
-### 3. Integración con Streaming
+### 3. Integration con Streaming
 
 ```python
 from mistral_client import MistralAIClient
@@ -565,7 +565,7 @@ for chunk in client.chat_completion_stream(messages):
 print()
 ```
 
-### 4. Integración con Métricas
+### 4. Integration con Métricas
 
 ```python
 from mistral_client import MistralAIClient
@@ -585,7 +585,7 @@ print(f"Time: {metrics['duration']:.3f}s")
 
 - **Empieza con `mistral-small-latest`**: Para la mayoría de los casos
 - **Usa `mistral-large-latest`**: Solo para tareas complejas
-- **Prueba diferentes modelos**: Compara resultados
+- **Test diferentes modelos**: Compara resultados
 - **Monitorea el uso**: Optimiza según necesidades
 
 ### 2. Control de Determinismo
@@ -595,7 +595,7 @@ print(f"Time: {metrics['duration']:.3f}s")
 - **Nivel 4-5**: Para creatividad
 - **Ajusta dinámicamente**: Según el contexto
 
-### 3. Manejo de Archivos
+### 3. Handling de Files
 
 - **Valida antes de subir**: Existencia, tamaño, tipo
 - **Limpia después de usar**: Elimina archivos no necesarios
@@ -605,11 +605,11 @@ print(f"Time: {metrics['duration']:.3f}s")
 ### 4. Optimización de Prompts
 
 - **Sé específico**: Prompts claros y concisos
-- **Proporciona contexto**: Información relevante
+- **Proporciona contexto**: Information relevante
 - **Usa ejemplos**: Few-shot learning
 - **Iteración**: Mejora basado en resultados
 
-### 5. Manejo de Errores
+### 5. Handling de Errors
 
 - **Valida entradas**: Antes de enviar a API
 - **Maneja excepciones**: Graceful degradation

@@ -1,105 +1,105 @@
-# 📚 Documentación Completa del Proyecto Mistral AI Tests
+# 📚 Complete Documentation for Mistral AI Tests Project
 
-## 🎯 Visión General del Proyecto
+## 🎯 Project Overview
 
-**Mistral AI Tests** es un sistema completo para probar y demostrar las capacidades de la API de Mistral AI, con enfoque especial en:
+**Mistral AI Tests** is a comprehensive system for testing and demonstrating the capabilities of the Mistral AI API, with special focus on:
 
-- Control de determinismo en respuestas de IA
-- Procesamiento de documentos con Document QnA
-- Gestión avanzada de archivos
-- Métricas de rendimiento y optimización
+- Determinism control in AI responses
+- Document processing with Document QnA
+- Advanced file management
+- Performance metrics and optimization
 
-## 🗂️ Estructura del Proyecto
+## 🗂️ Project Structure
 
 ```
 MistralAITests/
-├── docs/                          # Documentación completa
-│   ├── PROJECT_OVERVIEW.md        # Este documento
-│   ├── MODEL_USAGE_GUIDE.md       # Guía de modelos y ejemplos
-│   ├── ARCHITECTURE.md             # Arquitectura del sistema
-│   ├── API_INTEGRATION.md         # Integración con Mistral AI API
-│   ├── DETERMINISM_GUIDE.md       # Guía de control de determinismo
-│   ├── DOCUMENT_QNA_GUIDE.md      # Guía de Document QnA
-│   └── TESTING_GUIDE.md           # Guía de pruebas y testing
-├── src/                           # Código fuente
+├── docs/                          # Complete documentation
+│   ├── PROJECT_OVERVIEW.md        # This document
+│   ├── MODEL_USAGE_GUIDE.md       # Models and examples guide
+│   ├── ARCHITECTURE.md             # System architecture
+│   ├── API_INTEGRATION.md         # Mistral AI API integration
+│   ├── DETERMINISM_GUIDE.md       # Determinism control guide
+│   ├── DOCUMENT_QNA_GUIDE.md      # Document QnA guide
+│   └── TESTING_GUIDE.md           # Testing guide
+├── src/                           # Source code
 │   ├── __init__.py
-│   ├── determinism_controller.py   # Control de determinismo
-│   ├── document_manager.py        # Gestión de documentos
-│   ├── mistral_client.py          # Cliente de Mistral AI
-│   ├── utils.py                   # Utilidades
-│   ├── example_determinism.py     # Ejemplo de determinismo
-│   └── example_document_qna.py    # Ejemplo de Document QnA
-├── tests/                         # Pruebas unitarias
+│   ├── determinism_controller.py   # Determinism control
+│   ├── document_manager.py        # Document management
+│   ├── mistral_client.py          # Mistral AI client
+│   ├── utils.py                   # Utilities
+│   ├── example_determinism.py     # Determinism example
+│   └── example_document_qna.py    # Document QnA example
+├── tests/                         # Unit tests
 │   ├── __init__.py
-│   ├── test_document_manager.py   # Pruebas de gestión de documentos
-│   └── test_mistral.py            # Pruebas del cliente Mistral
-├── test_docs/                     # Documentos de prueba
-│   ├── 1805.04770.pdf            # Artículo científico
-│   ├── cihi-annual-report-2024-2025-en.pdf  # Informe anual
-│   ├── edc-2024-annual-report.pdf # Informe anual EDC
-│   └── r1200appendix_d.pdf        # Apéndice de informe
-├── .env.example                   # Ejemplo de variables de entorno
+│   ├── test_document_manager.py   # Document management tests
+│   └── test_mistral.py            # Mistral client tests
+├── test_docs/                     # Test documents
+│   ├── 1805.04770.pdf            # Scientific article
+│   ├── cihi-annual-report-2024-2025-en.pdf  # Annual report
+│   ├── edc-2024-annual-report.pdf # EDC annual report
+│   └── r1200appendix_d.pdf        # Report appendix
+├── .env.example                   # Environment variables example
 ├── .gitignore
-├── AGENTS.md                      # Instrucciones para agentes
-├── main_examples.py               # Menú principal de ejemplos
-├── pyproject.toml                 # Configuración del proyecto
-├── README.md                      # Documentación principal
-├── requirements.txt               # Dependencias de producción
-└── requirements-dev.txt           # Dependencias de desarrollo
+├── AGENTS.md                      # Agent instructions
+├── main_examples.py               # Main examples menu
+├── pyproject.toml                 # Project configuration
+├── README.md                      # Main documentation
+├── requirements.txt               # Production dependencies
+└── requirements-dev.txt           # Development dependencies
 ```
 
-## 🚀 Características Principales
+## 🚀 Main Features
 
-### 1. Control de Determinismo Avanzado
+### 1. Advanced Determinism Control
 
-- **5 niveles de determinismo** (1-5) para controlar creatividad vs precisión
-- **Parámetros automáticos**: Temperatura, top-p, penalizaciones
-- **Cambio dinámico**: Ajuste de niveles en tiempo real
-- **Sobrescritura manual**: Posibilidad de personalizar parámetros
+- **5 determinism levels** (1-5) to control creativity vs precision
+- **Automatic parameters**: Temperature, top-p, penalties
+- **Dynamic switching**: Real-time level adjustment
+- **Manual override**: Ability to customize parameters
 
-### 2. Document QnA con Archivos
+### 2. Document QnA with Files
 
-- **Subida de documentos**: PDF, imágenes, y otros formatos
-- **Preguntas sobre contenido**: Extracción de información específica
-- **Gestión completa**: Listado, recuperación y eliminación de archivos
-- **URLs firmadas**: Acceso temporal seguro a documentos
+- **Document upload**: PDF, images, and other formats
+- **Content questions**: Specific information extraction
+- **Complete management**: Listing, retrieval, and deletion of files
+- **Signed URLs**: Secure temporary access to documents
 
-### 3. Integración con Mistral AI API
+### 3. Mistral AI API Integration
 
-- **Modelos múltiples**: Soporte para todos los modelos de Mistral
-- **Streaming en tiempo real**: Respuestas progresivas
-- **Métricas detalladas**: Tokens, tiempo de respuesta, rendimiento
-- **Manejo de errores**: Robusto y con recuperación
+- **Multiple models**: Support for all Mistral models
+- **Real-time streaming**: Progressive responses
+- **Detailed metrics**: Tokens, response time, performance
+- **Error handling**: Robust with recovery
 
-### 4. Sistema de Pruebas Completo
+### 4. Complete Testing System
 
-- **36 pruebas unitarias**: Cobertura completa de funcionalidad
-- **Pruebas de integración**: Flujos completos de trabajo
-- **Mocking**: Pruebas aisladas sin dependencias externas
-- **Cobertura de código**: Métricas de calidad
+- **36 unit tests**: Complete functionality coverage
+- **Integration tests**: Full workflows
+- **Mocking**: Isolated tests without external dependencies
+- **Code coverage**: Quality metrics
 
-## 📋 Módulos Principales
+## 📋 Main Modules
 
 ### 1. `determinism_controller.py`
 
-Controlador avanzado para gestionar niveles de determinismo:
+Advanced controller for managing determinism levels:
 
 ```python
-controller = DeterminismController(level=3)  # Nivel balanceado
-params = controller.get_parameters()        # Obtener parámetros
-controller.set_level(2)                     # Cambiar nivel
+controller = DeterminismController(level=3)  # Balanced level
+params = controller.get_parameters()        # Get parameters
+controller.set_level(2)                     # Change level
 ```
 
-**Niveles disponibles:**
-- Nivel 1: Exacto (mínima creatividad)
-- Nivel 2: Enfocado (baja creatividad)
-- Nivel 3: Balanceado (predeterminado)
-- Nivel 4: Creativo (alta creatividad)
-- Nivel 5: Libre (máxima creatividad)
+**Available levels:**
+- Level 1: Exact (minimum creativity)
+- Level 2: Focused (low creativity)
+- Level 3: Balanced (default)
+- Level 4: Creative (high creativity)
+- Level 5: Free (maximum creativity)
 
 ### 2. `document_manager.py`
 
-Gestión completa de documentos:
+Complete document management:
 
 ```python
 doc_manager = DocumentManager(api_key)
@@ -110,7 +110,7 @@ doc_manager.delete_document(file_info.id)
 
 ### 3. `mistral_client.py`
 
-Cliente principal para interactuar con Mistral AI:
+Main client for interacting with Mistral AI:
 
 ```python
 client = MistralAIClient(api_key=api_key, model="mistral-small-latest")
@@ -121,7 +121,7 @@ for chunk in client.chat_completion_stream(messages):
 
 ### 4. `utils.py`
 
-Funciones utilitarias:
+Utility functions:
 
 ```python
 from utils import format_chat_message, validate_api_key
@@ -130,171 +130,171 @@ message = format_chat_message("user", "Hello!")
 is_valid = validate_api_key(api_key)
 ```
 
-## 🎨 Ejemplos Prácticos
+## 🎨 Practical Examples
 
-### 1. Ejemplo de Control de Determinismo
+### 1. Determinism Control Example
 
-**Archivo**: `src/example_determinism.py`
+**File**: `src/example_determinism.py`
 
-Demuestra:
-- Uso de diferentes modelos (`mistral-tiny`, `mistral-small`, `mistral-medium`, `mistral-large`)
-- Todos los niveles de determinismo (1-5)
-- Streaming en tiempo real
-- Métricas de rendimiento
-- Cambio dinámico de parámetros
+Demonstrates:
+- Use of different models (`mistral-tiny`, `mistral-small`, `mistral-medium`, `mistral-large`)
+- All determinism levels (1-5)
+- Real-time streaming
+- Performance metrics
+- Dynamic parameter switching
 
-**Ejecución:**
+**Execution:**
 ```bash
 PYTHONPATH=/home/dlopez/code/MistalAITests python src/example_determinism.py
 ```
 
-### 2. Ejemplo de Document QnA
+### 2. Document QnA Example
 
-**Archivo**: `src/example_document_qna.py`
+**File**: `src/example_document_qna.py`
 
-Demuestra:
-- Subida de documentos PDF
-- Preguntas sobre contenido del documento
-- Gestión de archivos (listar, eliminar)
-- Integración con Mistral AI para Document QnA
+Demonstrates:
+- PDF document upload
+- Content-based questions
+- File management (list, delete)
+- Integration with Mistral AI for Document QnA
 
-**Ejecución:**
+**Execution:**
 ```bash
 PYTHONPATH=/home/dlopez/code/MistalAITests python src/example_document_qna.py
 ```
 
-## 🧪 Sistema de Pruebas
+## 🧪 Testing System
 
-### Ejecución de Pruebas
+### Running Tests
 
 ```bash
-# Ejecutar todas las pruebas
+# Run all tests
 python -m pytest tests/ -v
 
-# Ejecutar pruebas específicas
+# Run specific tests
 python -m pytest tests/test_document_manager.py -v
 python -m pytest tests/test_mistral.py -v
 
-# Con cobertura
+# With coverage
 python -m pytest --cov=src tests/ -v
 ```
 
-### Resultados de Pruebas
+### Test Results
 
-- **36 pruebas unitarias**: Todas pasando ✅
-- **Cobertura de código**: 34% global, 79-86% en módulos principales
-- **Tiempo de ejecución**: ~0.8 segundos
-- **Pruebas de integración**: Documentos reales y flujos completos
+- **36 unit tests**: All passing ✅
+- **Code coverage**: 34% overall, 79-86% in main modules
+- **Execution time**: ~0.8 seconds
+- **Integration tests**: Real documents and complete workflows
 
-## 📊 Modelos de Mistral AI Utilizados
+## 📊 Mistral AI Models Used
 
-| Modelo | Tamaño | Velocidad | Costo | Uso Principal |
-|--------|--------|----------|-------|---------------|
-| `mistral-tiny` | Muy pequeño | ⚡⚡⚡⚡ | 💰 | Pruebas rápidas |
-| `mistral-small-latest` | Pequeño | ⚡⚡⚡ | 💰💰 | Uso general, Document QnA |
-| `mistral-medium-latest` | Mediano | ⚡⚡ | 💰💰💰 | Tareas complejas |
-| `mistral-large-latest` | Grande | ⚡ | 💰💰💰💰 | Análisis profundo |
+| Model | Size | Speed | Cost | Main Use |
+|-------|------|-------|------|----------|
+| `mistral-tiny` | Very small | ⚡⚡⚡⚡ | 💰 | Quick tests |
+| `mistral-small-latest` | Small | ⚡⚡⚡ | 💰💰 | General use, Document QnA |
+| `mistral-medium-latest` | Medium | ⚡⚡ | 💰💰💰 | Complex tasks |
+| `mistral-large-latest` | Large | ⚡ | 💰💰💰💰 | Deep analysis |
 
-**Modelo predeterminado**: `mistral-small-latest` (equilibrio ideal entre costo y calidad)
+**Default model**: `mistral-small-latest` (ideal balance between cost and quality)
 
-## 🔧 Configuración y Requisitos
+## 🔧 Configuration and Requirements
 
-### Requisitos Previos
+### Prerequisites
 
 - Python 3.12+
-- Virtual environment (recomendado)
-- API Key de Mistral AI (en `.env`)
+- Virtual environment (recommended)
+- Mistral AI API Key (in `.env`)
 
-### Instalación
+### Installation
 
 ```bash
-# Crear entorno virtual
+# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate
 
-# Instalar dependencias
+# Install dependencies
 pip install -r requirements.txt
 pip install -r requirements-dev.txt
 
-# Configurar API Key
+# Configure API Key
 cp .env.example .env
-# Editar .env con tu API Key
+# Edit .env with your API Key
 ```
 
-### Variables de Entorno
+### Environment Variables
 
 ```env
 # .env file
-MISTRAL_AI_API_KEY="tu_api_key_aqui"
+MISTRAL_AI_API_KEY="your_api_key_here"
 ```
 
-## 📚 Guías y Documentación Adicional
+## 📚 Additional Guides and Documentation
 
-1. **[Guía de Modelos y Uso](docs/MODEL_USAGE_GUIDE.md)**: Detalles sobre qué modelo se usa en cada ejemplo
-2. **[Arquitectura del Sistema](docs/ARCHITECTURE.md)**: Diagrama y explicación de la arquitectura
-3. **[Integración con API](docs/API_INTEGRATION.md)**: Cómo funciona la integración con Mistral AI
-4. **[Control de Determinismo](docs/DETERMINISM_GUIDE.md)**: Guía detallada del sistema de determinismo
-5. **[Document QnA](docs/DOCUMENT_QNA_GUIDE.md)**: Guía completa de Document QnA
-6. **[Guía de Pruebas](docs/TESTING_GUIDE.md)**: Cómo ejecutar y entender las pruebas
+1. **[Models and Usage Guide](docs/MODEL_USAGE_GUIDE.md)**: Details about which model is used in each example
+2. **[System Architecture](docs/ARCHITECTURE.md)**: Diagram and explanation of the architecture
+3. **[API Integration](docs/API_INTEGRATION.md)**: How the Mistral AI integration works
+4. **[Determinism Control](docs/DETERMINISM_GUIDE.md)**: Detailed guide to the determinism system
+5. **[Document QnA](docs/DOCUMENT_QNA_GUIDE.md)**: Complete Document QnA guide
+6. **[Testing Guide](docs/TESTING_GUIDE.md)**: How to run and understand tests
 
-## 🎯 Casos de Uso
+## 🎯 Use Cases
 
-### 1. Análisis de Documentos
-- **Problema**: Extraer información de informes anuales, artículos científicos
-- **Solución**: Document QnA con `mistral-small-latest`
-- **Beneficio**: Respuestas precisas basadas en contenido específico
+### 1. Document Analysis
+- **Problem**: Extract information from annual reports, scientific articles
+- **Solution**: Document QnA with `mistral-small-latest`
+- **Benefit**: Precise answers based on specific content
 
-### 2. Generación de Contenido
-- **Problema**: Crear contenido creativo (poemas, historias, ideas)
-- **Solución**: `mistral-large-latest` con nivel 4-5
-- **Beneficio**: Alta creatividad y variación en respuestas
+### 2. Content Generation
+- **Problem**: Create creative content (poems, stories, ideas)
+- **Solution**: `mistral-large-latest` with level 4-5
+- **Benefit**: High creativity and variation in responses
 
-### 3. Asistente Técnico
-- **Problema**: Respuestas precisas a preguntas técnicas
-- **Solución**: `mistral-medium-latest` con nivel 1-2
-- **Beneficio**: Respuestas exactas y consistentes
+### 3. Technical Assistant
+- **Problem**: Precise answers to technical questions
+- **Solution**: `mistral-medium-latest` with level 1-2
+- **Benefit**: Exact and consistent responses
 
-### 4. Chatbot Balanceado
-- **Problema**: Conversaciones generales equilibradas
-- **Solución**: `mistral-small-latest` con nivel 3
-- **Beneficio**: Buen equilibrio entre creatividad y precisión
+### 4. Balanced Chatbot
+- **Problem**: General balanced conversations
+- **Solution**: `mistral-small-latest` with level 3
+- **Benefit**: Good balance between creativity and precision
 
-## 🚀 Roadmap y Mejoras Futuras
+## 🚀 Roadmap and Future Improvements
 
-### Mejoras Planificadas
+### Planned Improvements
 
-1. **Soporte para más formatos de documento**: Word, Excel, PowerPoint
-2. **Procesamiento por lotes**: Múltiples documentos simultáneos
-3. **Interfaz web**: Dashboard para gestión de documentos
-4. **Cache de respuestas**: Optimización de consultas frecuentes
-5. **Análisis avanzado**: Extracción de tablas, gráficos de documentos
+1. **Support for more document formats**: Word, Excel, PowerPoint
+2. **Batch processing**: Multiple documents simultaneously
+3. **Web interface**: Dashboard for document management
+4. **Response caching**: Optimization for frequent queries
+5. **Advanced analysis**: Table extraction, charts from documents
 
-### Contribuciones
+### Contributions
 
-Las contribuciones son bienvenidas. Por favor:
-1. Fork el proyecto
-2. Crea una rama (`git checkout -b feature/nueva-caracteristica`)
-3. Commit tus cambios (`git commit -am 'Add nueva caracteristica'`)
-4. Push a la rama (`git push origin feature/nueva-caracteristica`)
-5. Crea un Pull Request
+Contributions are welcome. Please:
+1. Fork the project
+2. Create a branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Create a Pull Request
 
-## 📞 Soporte y Comunidad
+## 📞 Support and Community
 
-- **Issues**: Reporta problemas en GitHub Issues
-- **Documentación**: Consulta la documentación oficial de Mistral AI
-- **Comunidad**: Únete a la comunidad de Mistral AI
+- **Issues**: Report problems in GitHub Issues
+- **Documentation**: Consult the official Mistral AI documentation
+- **Community**: Join the Mistral AI community
 
-## 🎉 Conclusión
+## 🎉 Conclusion
 
-Este proyecto proporciona una implementación completa y bien probada para trabajar con la API de Mistral AI, incluyendo:
+This project provides a complete and well-tested implementation for working with the Mistral AI API, including:
 
-- ✅ Control avanzado de determinismo
-- ✅ Document QnA funcional con archivos reales
-- ✅ Sistema de pruebas completo (36 pruebas pasando)
-- ✅ Documentación exhaustiva
-- ✅ Ejemplos prácticos y funcionales
-- ✅ Integración con múltiples modelos de Mistral AI
+- ✅ Advanced determinism control
+- ✅ Functional Document QnA with real files
+- ✅ Complete testing system (36 tests passing)
+- ✅ Exhaustive documentation
+- ✅ Practical and functional examples
+- ✅ Integration with multiple Mistral AI models
 
-**Estado actual**: Producción lista 🚀
+**Current status**: Production ready 🚀
 
-**Próximos pasos**: Implementar mejoras del roadmap y expandir capacidades de procesamiento de documentos.
+**Next steps**: Implement roadmap improvements and expand document processing capabilities.

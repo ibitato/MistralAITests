@@ -1,18 +1,18 @@
-# 🧪 Guía Completa de Pruebas
+# 🧪 Guía Completa de Tests
 
-## 🎯 Visión General
+## 🎯 Overview
 
 Esta guía detalla el sistema de pruebas implementado en el proyecto, incluyendo cómo ejecutar pruebas, entender los resultados y añadir nuevas pruebas.
 
-## 📊 Estadísticas de Pruebas
+## 📊 Estadísticas de Tests
 
 - **Total de pruebas**: 36
-- **Pruebas pasando**: 36 (100%)
+- **Tests pasando**: 36 (100%)
 - **Cobertura de código**: 34% global, 79-86% en módulos principales
 - **Tiempo de ejecución**: ~0.8 segundos
 - **Framework**: pytest
 
-## 🏗️ Estructura de Pruebas
+## 🏗️ Estructura de Tests
 
 ```
 tests/
@@ -21,9 +21,9 @@ tests/
 └── __init__.py               # Inicialización
 ```
 
-## 🚀 Ejecución de Pruebas
+## 🚀 Execution de Tests
 
-### Ejecutar Todas las Pruebas
+### Ejecutar Todas las Tests
 
 ```bash
 # Ejecutar todas las pruebas
@@ -36,54 +36,54 @@ python -m pytest --cov=src tests/ -v
 python -m pytest --cov=src --cov-report=term-missing tests/
 ```
 
-### Ejecutar Pruebas Específicas
+### Ejecutar Tests Específicas
 
 ```bash
-# Pruebas de document manager
+# Tests de document manager
 python -m pytest tests/test_document_manager.py -v
 
-# Pruebas de Mistral client
+# Tests de Mistral client
 python -m pytest tests/test_mistral.py -v
 
-# Prueba específica
+# Test específica
 python -m pytest tests/test_document_manager.py::TestDocumentManager::test_upload_document_success -v
 ```
 
 ### Ejecutar con Marcadores
 
 ```bash
-# Pruebas de integración
+# Tests de integración
 python -m pytest tests/ -m integration -v
 
-# Pruebas unitarias
+# Tests unitarias
 python -m pytest tests/ -m unit -v
 ```
 
-## 📋 Pruebas de Document Manager
+## 📋 Tests de Document Manager
 
-### Lista de Pruebas (17 pruebas)
+### List de Tests (17 pruebas)
 
-| # | Prueba | Descripción | Estado |
+| # | Test | Descripción | State |
 |---|--------|-------------|--------|
 | 1 | test_initialization_success | Inicialización exitosa con API key válida | ✅ |
 | 2 | test_initialization_failure | Inicialización fallida con API key inválida | ✅ |
 | 3 | test_upload_document_success | Subida de documento exitosa | ✅ |
-| 4 | test_upload_document_file_not_found | Manejo de archivo no encontrado | ✅ |
-| 5 | test_upload_document_too_large | Validación de tamaño de archivo | ✅ |
-| 6 | test_upload_document_invalid_purpose | Validación de propósito inválido | ✅ |
-| 7 | test_list_documents_success | Listado de documentos exitoso | ✅ |
+| 4 | test_upload_document_file_not_found | Handling de archivo no encontrado | ✅ |
+| 5 | test_upload_document_too_large | Validation de tamaño de archivo | ✅ |
+| 6 | test_upload_document_invalid_purpose | Validation de propósito inválido | ✅ |
+| 7 | test_list_documents_success | Listdo de documentos exitoso | ✅ |
 | 8 | test_get_document_info_success | Obtención de información exitosa | ✅ |
-| 9 | test_get_document_info_invalid_id | Manejo de ID inválido | ✅ |
+| 9 | test_get_document_info_invalid_id | Handling de ID inválido | ✅ |
 | 10 | test_delete_document_success | Eliminación de documento exitosa | ✅ |
-| 11 | test_delete_document_invalid_id | Manejo de ID inválido en eliminación | ✅ |
+| 11 | test_delete_document_invalid_id | Handling de ID inválido en eliminación | ✅ |
 | 12 | test_get_signed_url_success | Generación de URL firmada exitosa | ✅ |
-| 13 | test_get_signed_url_invalid_id | Manejo de ID inválido en URL firmada | ✅ |
-| 14 | test_get_signed_url_invalid_expiry | Validación de tiempo de expiración | ✅ |
+| 13 | test_get_signed_url_invalid_id | Handling de ID inválido en URL firmada | ✅ |
+| 14 | test_get_signed_url_invalid_expiry | Validation de tiempo de expiración | ✅ |
 | 15 | test_upload_real_file | Subida de archivo real (integración) | ✅ |
-| 16 | test_file_validation | Validación de archivos (integración) | ✅ |
+| 16 | test_file_validation | Validation de archivos (integración) | ✅ |
 | 17 | test_document_lifecycle | Ciclo de vida completo de documento (integración) | ✅ |
 
-### Ejemplo de Prueba Unitaria
+### Example de Test Unitaria
 
 ```python
 def test_upload_document_success(self, mock_client):
@@ -109,7 +109,7 @@ def test_upload_document_success(self, mock_client):
     mock_instance.files.upload.assert_called_once()
 ```
 
-### Ejemplo de Prueba de Integración
+### Example de Test de Integration
 
 ```python
 def test_document_lifecycle(self, tmp_path):
@@ -161,11 +161,11 @@ def test_document_lifecycle(self, tmp_path):
         assert deleted is True
 ```
 
-## 📋 Pruebas de Mistral AI Client
+## 📋 Tests de Mistral AI Client
 
-### Lista de Pruebas (19 pruebas)
+### List de Tests (19 pruebas)
 
-| # | Prueba | Descripción | Estado |
+| # | Test | Descripción | State |
 |---|--------|-------------|--------|
 | 1 | test_initialization_with_api_key | Inicialización con API key | ✅ |
 | 2 | test_initialization_without_api_key | Inicialización sin API key | ✅ |
@@ -177,17 +177,17 @@ def test_document_lifecycle(self, tmp_path):
 | 8 | test_dynamic_level_switching | Cambio dinámico de nivel | ✅ |
 | 9 | test_chat_completion_stream | Streaming de chat | ✅ |
 | 10 | test_chat_completion_with_metrics | Chat con métricas | ✅ |
-| 11 | test_error_handling_empty_messages | Manejo de mensajes vacíos | ✅ |
-| 12 | test_error_handling_api_failures | Manejo de fallos de API | ✅ |
-| 13 | test_validate_api_key_valid | Validación de API key válida | ✅ |
-| 14 | test_validate_api_key_empty | Validación de API key vacía | ✅ |
-| 15 | test_validate_api_key_short | Validación de API key corta | ✅ |
+| 11 | test_error_handling_empty_messages | Handling de mensajes vacíos | ✅ |
+| 12 | test_error_handling_api_failures | Handling de fallos de API | ✅ |
+| 13 | test_validate_api_key_valid | Validation de API key válida | ✅ |
+| 14 | test_validate_api_key_empty | Validation de API key vacía | ✅ |
+| 15 | test_validate_api_key_short | Validation de API key corta | ✅ |
 | 16 | test_format_chat_message_valid | Formateo de mensaje válido | ✅ |
 | 17 | test_format_chat_message_invalid_role | Formateo de mensaje con rol inválido | ✅ |
 | 18 | test_truncate_text_no_truncation | Truncamiento sin truncar | ✅ |
 | 19 | test_truncate_text_with_truncation | Truncamiento con truncamiento | ✅ |
 
-### Ejemplo de Prueba de Chat Completion
+### Example de Test de Chat Completion
 
 ```python
 def test_chat_completion(self, mock_client):
@@ -213,7 +213,7 @@ def test_chat_completion(self, mock_client):
     mock_instance.chat.complete.assert_called_once()
 ```
 
-### Ejemplo de Prueba de Streaming
+### Example de Test de Streaming
 
 ```python
 def test_chat_completion_stream(self, mock_client):
@@ -249,7 +249,7 @@ def test_chat_completion_stream(self, mock_client):
     mock_instance.chat.stream.assert_called_once()
 ```
 
-## 🛠️ Herramientas de Testing
+## 🛠️ Tools de Testing
 
 ### pytest
 
@@ -259,7 +259,7 @@ Framework principal de pruebas:
 # Instalar
 pip install pytest pytest-mock pytest-cov
 
-# Configuración en pyproject.toml
+# Configuration en pyproject.toml
 [tool.pytest.ini_options]
 python_files = "test_*.py"
 testpaths = ["tests"]
@@ -297,7 +297,7 @@ python -m pytest --cov=src --cov-report=term-missing tests/
 python -m pytest --cov=src --cov-report=html tests/
 ```
 
-## 📊 Cobertura de Código
+## 📊 Cobertura de Code
 
 ### Informe de Cobertura
 
@@ -325,36 +325,36 @@ TOTAL                             556    369    34%
 ### Áreas para Mejorar Cobertura
 
 1. **Mistral Client**:
-   - Métodos de streaming avanzados
-   - Manejo de errores en streaming
+   - Methods de streaming avanzados
+   - Handling de errores en streaming
    - Métricas detalladas
 
 2. **Document Manager**:
    - Descarga de documentos
-   - Manejo de URLs firmadas
-   - Errores específicos
+   - Handling de URLs firmadas
+   - Errors específicos
 
 3. **Utils**:
    - Funciones de truncamiento
-   - Validación avanzada
+   - Validation avanzada
 
 ## 📈 Métricas de Calidad
 
-### Calidad de Código
+### Calidad de Code
 
 - **Black**: 100% formato consistente
 - **Ruff**: 100% sin warnings
 - **Type hints**: 100% en módulos principales
-- **Documentación**: 100% docstrings completos
+- **Documentation**: 100% docstrings completos
 
-### Métricas de Pruebas
+### Métricas de Tests
 
 - **Cobertura global**: 34%
 - **Cobertura en módulos principales**: 79-88%
-- **Pruebas pasando**: 100%
+- **Tests pasando**: 100%
 - **Tiempo de ejecución**: ~0.8s
 
-## 🔧 Configuración de Pruebas
+## 🔧 Configuration de Tests
 
 ### pyproject.toml
 
@@ -396,30 +396,30 @@ precision = 2
 
 ## 📚 Mejores Prácticas de Testing
 
-### 1. Nomenclatura de Pruebas
+### 1. Nomenclatura de Tests
 
 ```python
 # Bueno
 def test_upload_document_success(self):
-    # Prueba de éxito
+    # Test de éxito
     
 # Bueno
 def test_upload_document_file_not_found(self):
-    # Prueba de error específico
+    # Test de error específico
     
 # Malo
 def test_upload(self):
     # Demasiado genérico
 ```
 
-### 2. Estructura de Pruebas
+### 2. Estructura de Tests
 
 ```python
 def test_feature(self):
     # 1. Setup
     mock = MagicMock()
     
-    # 2. Ejecución
+    # 2. Execution
     result = function_to_test()
     
     # 3. Verificación
@@ -448,7 +448,7 @@ def test_api_call(self, mock_client):
     mock_instance.method.assert_called_once()
 ```
 
-### 4. Pruebas de Error
+### 4. Tests de Error
 
 ```python
 def test_error_handling(self):
@@ -460,7 +460,7 @@ def test_error_handling(self):
         function_under_test()
 ```
 
-### 5. Pruebas de Integración
+### 5. Tests de Integration
 
 ```python
 def test_integration(self, tmp_path):
@@ -475,9 +475,9 @@ def test_integration(self, tmp_path):
     assert result is not None
 ```
 
-## 🚀 Añadir Nuevas Pruebas
+## 🚀 Añadir Nuevas Tests
 
-### 1. Crear Archivo de Prueba
+### 1. Crear File de Test
 
 ```bash
 touch tests/test_new_feature.py
@@ -519,7 +519,7 @@ class TestNewFeature:
             NewFeature(None)
 ```
 
-### 3. Ejecutar Pruebas Nuevas
+### 3. Ejecutar Tests Nuevas
 
 ```bash
 python -m pytest tests/test_new_feature.py -v
@@ -531,7 +531,7 @@ python -m pytest tests/test_new_feature.py -v
 python -m pytest --cov=src --cov-report=term-missing tests/test_new_feature.py
 ```
 
-## 📊 Integración con CI/CD
+## 📊 Integration con CI/CD
 
 ### GitHub Actions
 
@@ -597,15 +597,15 @@ coverage:
       - coverage.xml
 ```
 
-## 🛡️ Manejo de Errores en Pruebas
+## 🛡️ Handling de Errors en Tests
 
-### Errores Comunes
+### Errors Comunes
 
 | Error | Causa | Solución |
 |-------|-------|----------|
-| ModuleNotFoundError | Módulo no instalado | Instalar dependencias |
+| ModuleNotFoundError | Module no instalado | Instalar dependencias |
 | ImportError | Ruta incorrecta | Verificar PYTHONPATH |
-| AssertionError | Prueba fallida | Revisar lógica de prueba |
+| AssertionError | Test fallida | Revisar lógica de prueba |
 | MockNotCalled | Mock no llamado | Verificar setup de mock |
 | FixtureNotFound | Fixture no encontrado | Definir fixture |
 
@@ -660,7 +660,7 @@ El sistema de pruebas implementado proporciona:
 - ✅ **Calidad de código**: 100% formato, 0 warnings
 - ✅ **Rápida ejecución**: ~0.8 segundos para todas las pruebas
 - ✅ **Fácil mantenimiento**: Estructura clara y consistente
-- ✅ **Integración CI/CD**: Listo para pipelines de integración continua
+- ✅ **Integration CI/CD**: Listo para pipelines de integración continua
 
 **Recomendaciones:**
 

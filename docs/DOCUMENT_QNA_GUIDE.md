@@ -6,26 +6,26 @@ Document QnA (Question and Answering) es una capacidad que permite hacer pregunt
 
 - **OCR** (Optical Character Recognition) para extraer texto de documentos
 - **Modelos de lenguaje** para comprender y responder preguntas
-- **Gestión de archivos** para manejar documentos subidos
+- **Management de archivos** para manejar documentos subidos
 
 ## 📋 Flujo de Trabajo de Document QnA
 
 ```mermaid
 flowchart TD
-    A[Usuario] -->|Subir documento| B[DocumentManager]
+    A[User] -->|Subir documento| B[DocumentManager]
     B -->|upload_document| C[Mistral AI API]
     C -->|File ID| B
     B -->|File ID| A
     
     A -->|Pregunta + File ID| D[MistralAIClient]
     D -->|chat_completion| C
-    C -->|Respuesta| D
-    D -->|Respuesta| A
+    C -->|Response| D
+    D -->|Response| A
     
     A -->|Gestionar documentos| B
     B -->|list/delete| C
-    C -->|Resultado| B
-    B -->|Resultado| A
+    C -->|Result| B
+    B -->|Result| A
 
     style A fill:#f9f
     style B fill:#bbf
@@ -33,9 +33,9 @@ flowchart TD
     style D fill:#f96
 ```
 
-## 🚀 Implementación Paso a Paso
+## 🚀 Implementation Paso a Paso
 
-### 1. Configuración Inicial
+### 1. Configuration Inicial
 
 ```python
 from dotenv import load_dotenv
@@ -51,7 +51,7 @@ doc_manager = DocumentManager(api_key)
 mistral_client = MistralAIClient(api_key)
 ```
 
-### 2. Subida de Documentos
+### 2. Subida de Documents
 
 ```python
 # Subir un documento PDF
@@ -65,16 +65,16 @@ print(f"File ID: {file_info.id}")
 print(f"Size: {file_info.bytes} bytes")
 ```
 
-**Parámetros de subida:**
+**Parameters de subida:**
 - `file_path`: Ruta al archivo
 - `purpose`: "ocr" (para Document QnA), "fine-tune", o "batch"
 
 **Validaciones:**
-- Archivo existe
+- File existe
 - Tamaño máximo: 512MB
 - Formatos soportados: PDF, imágenes, texto
 
-### 3. Hacer Preguntas sobre el Documento
+### 3. Hacer Preguntas sobre el Document
 
 ```python
 # Crear mensajes con referencia al documento
@@ -98,8 +98,8 @@ response = mistral_client.chat_completion(
 print(f"Answer: {response}")
 ```
 
-**Tipos de contenido soportados:**
-- `text`: Texto de la pregunta
+**Types de contenido soportados:**
+- `text`: Text de la pregunta
 - `file`: ID de archivo subido (recomendado)
 - `file_id`: ID de archivo (legacy, aún soportado)
 - `document_url`: URL pública de documento
@@ -135,10 +135,10 @@ for question in questions:
         print(f"Error: {e}")
 ```
 
-### 5. Gestión de Documentos
+### 5. Management de Documents
 
 ```python
-# Listar todos los documentos
+# Listr todos los documentos
 documents = doc_manager.list_documents()
 
 print("Uploaded documents:")
@@ -158,7 +158,7 @@ if doc_manager.delete_document(file_info.id):
     print("\nDocument deleted successfully")
 ```
 
-## 📊 Ejemplo Completo con Documento Real
+## 📊 Example Completo con Document Real
 
 ```python
 import os
@@ -167,7 +167,7 @@ from document_manager import DocumentManager
 from mistral_client import MistralAIClient
 
 def main():
-    # Configuración
+    # Configuration
     load_dotenv()
     api_key = os.getenv("MISTRAL_AI_API_KEY")
     
@@ -232,43 +232,43 @@ if __name__ == "__main__":
     main()
 ```
 
-## 📚 Tipos de Documentos Soportados
+## 📚 Types de Documents Soportados
 
-### 1. Archivos PDF
+### 1. Files PDF
 
 - **Tamaño máximo**: 512MB
 - **Páginas**: Hasta 2000 páginas (depende del contenido)
 - **Formato**: PDF estándar (no PDF escaneados como imágenes)
-- **Ejemplo**: Informes anuales, artículos científicos, documentos técnicos
+- **Example**: Informes anuales, artículos científicos, documentos técnicos
 
 ### 2. Imágenes
 
 - **Formatos**: JPEG, PNG, GIF
 - **Tamaño máximo**: 20MB
 - **Resolución**: Hasta 4096x4096 píxeles
-- **Ejemplo**: Diagramas, gráficos, infografías
+- **Example**: Diagramas, gráficos, infografías
 
-### 3. Texto Plano
+### 3. Text Plano
 
 - **Formatos**: TXT, MD, CSV
 - **Tamaño máximo**: 512MB
-- **Ejemplo**: Archivos de registro, datos estructurados
+- **Example**: Files de registro, datos estructurados
 
 ### 4. Otros Formatios
 
 - **HTML**: Páginas web
-- **JSON**: Datos estructurados
-- **XML**: Datos estructurados
+- **JSON**: Datas estructurados
+- **XML**: Datas estructurados
 
-## 🎛️ Optimización de Parámetros
+## 🎛️ Optimización de Parameters
 
 ### Temperatura
 
-| Valor | Efecto | Uso Recomendado |
+| Value | Efecto | Uso Recomendado |
 |-------|--------|-----------------|
-| 0.1-0.3 | Respuestas precisas | Document QnA, datos factuales |
+| 0.1-0.3 | Responses precisas | Document QnA, datos factuales |
 | 0.5-0.7 | Equilibrio | Uso general, conversaciones |
-| 0.8-1.0 | Respuestas creativas | Generación de contenido |
+| 0.8-1.0 | Responses creativas | Generación de contenido |
 
 ### Nivel de Determinismo
 
@@ -276,11 +276,11 @@ if __name__ == "__main__":
 |-------|---------------------|
 | 1 | Extracción de datos exactos |
 | 2 | Análisis técnico detallado |
-| 3 | Respuestas balanceadas (recomendado) |
+| 3 | Responses balanceadas (recomendado) |
 | 4 | Interpretación creativa |
 | 5 | Insights innovadores |
 
-### Ejemplo de Optimización
+### Example de Optimización
 
 ```python
 # Para extracción de datos exactos
@@ -305,7 +305,7 @@ client = MistralAIClient(
 )
 ```
 
-## 🔍 Casos de Uso Avanzados
+## 🔍 Cases de Uso Avanzados
 
 ### 1. Análisis de Informes Anuales
 
@@ -341,7 +341,7 @@ for question in financial_questions:
     print(f"A: {answer}\n")
 ```
 
-### 2. Extracción de Información Técnica
+### 2. Extracción de Information Técnica
 
 ```python
 # Subir artículo científico
@@ -404,7 +404,7 @@ print("Summary:")
 print(summary)
 ```
 
-### 4. Comparación de Múltiples Documentos
+### 4. Comparación de Múltiples Documents
 
 ```python
 # Subir múltiples documentos
@@ -439,21 +439,21 @@ for question in comparison_questions:
     print(f"A: {answer}\n")
 ```
 
-## 📊 Manejo de Errores
+## 📊 Handling de Errors
 
-### Errores Comunes y Soluciones
+### Errors Comunes y Soluciones
 
 | Error | Causa | Solución |
 |-------|-------|----------|
-| FileNotFoundError | Archivo no existe | Verificar ruta del archivo |
-| ValueError (size) | Archivo > 512MB | Usar archivo más pequeño |
+| FileNotFoundError | File no existe | Verificar ruta del archivo |
+| ValueError (size) | File > 512MB | Usar archivo más pequeño |
 | ValueError (purpose) | Propósito inválido | Usar "ocr", "fine-tune", o "batch" |
 | RuntimeError (upload) | Error de API | Verificar conexión y API key |
 | RuntimeError (QnA) | Formato inválido | Verificar formato de mensajes |
-| 404 Not Found | Archivo no encontrado | Verificar file_id |
+| 404 Not Found | File no encontrado | Verificar file_id |
 | 429 Too Many Requests | Límite de tasa | Implementar retry con backoff |
 
-### Implementación de Manejo de Errores
+### Implementation de Handling de Errors
 
 ```python
 try:
@@ -497,22 +497,22 @@ except Exception as e:
 
 ### Buenas Prácticas
 
-1. **Manejo de API Key**:
+1. **Handling de API Key**:
    - Nunca en código fuente
    - Usar variables de entorno
    - Rotación periódica
 
-2. **Documentos Sensibles**:
+2. **Documents Sensibles**:
    - Eliminar después de usar
    - No almacenar innecesariamente
    - Usar URLs firmadas para acceso temporal
 
-3. **Validación de Entrada**:
+3. **Validation de Input**:
    - Validar tipos de archivo
    - Limitar tamaño de archivos
    - Escanear contenido si es necesario
 
-### Ejemplo de Seguridad
+### Example de Seguridad
 
 ```python
 # Validar archivo antes de subir
@@ -543,7 +543,7 @@ except Exception as e:
 
 ## 📈 Optimización de Rendimiento
 
-### 1. Cache de Respuestas
+### 1. Cache de Responses
 
 ```python
 from functools import lru_cache
@@ -594,7 +594,7 @@ questions = ["Q1", "Q2", "Q3"]
 answers = batch_document_qna(file_info.id, questions)
 ```
 
-### 3. Streaming para Documentos Grandes
+### 3. Streaming para Documents Grandes
 
 ```python
 def stream_document_qna(file_id, question):
@@ -621,10 +621,10 @@ file_info = doc_manager.upload_document("large_report.pdf", purpose="ocr")
 stream_document_qna(file_info.id, "Summarize this document")
 ```
 
-## 📚 Recursos Adicionales
+## 📚 Resources Adicionales
 
-- [Documentación de Mistral AI Files API](https://docs.mistral.ai/api/endpoint/files)
-- [Documentación de Chat Completions](https://docs.mistral.ai/api/endpoint/chat)
+- [Documentation de Mistral AI Files API](https://docs.mistral.ai/api/endpoint/files)
+- [Documentation de Chat Completions](https://docs.mistral.ai/api/endpoint/chat)
 - [Guía de Document QnA](https://docs.mistral.ai/capabilities/document_ai/document_qna)
 - [Cookbook de Document Understanding](https://colab.research.google.com/github/mistralai/cookbook/blob/main/mistral/ocr/document_understanding.ipynb)
 

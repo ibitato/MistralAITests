@@ -10,46 +10,46 @@ El sistema implementa **5 niveles de determinismo**, cada uno con configuracione
 
 ### Nivel 1: Exacto (Mínima Creatividad)
 
-**Descripción**: Respuestas precisas y consistentes con mínima variación.
+**Descripción**: Responses precisas y consistentes con mínima variación.
 
-**Parámetros:**
+**Parameters:**
 - Temperatura: 0.1
 - Top-P: 0.9
 - Frequency Penalty: 0.0
 - Presence Penalty: 0.0
 
-**Casos de Uso:**
-- Respuestas factuales
-- Datos técnicos
-- Información que requiere precisión
-- Respuestas repetibles
+**Cases de Uso:**
+- Responses factuales
+- Datas técnicos
+- Information que requiere precisión
+- Responses repetibles
 
-**Ejemplo:**
+**Example:**
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=1)
 response = client.chat_completion([
     {"role": "user", "content": "What is the capital of France?"}
 ])
-# Respuesta: "The capital of France is Paris."
+# Response: "The capital of France is Paris."
 ```
 
 ### Nivel 2: Enfocado (Baja Creatividad)
 
-**Descripción**: Respuestas enfocadas con baja creatividad pero algo de flexibilidad.
+**Descripción**: Responses enfocadas con baja creatividad pero algo de flexibilidad.
 
-**Parámetros:**
+**Parameters:**
 - Temperatura: 0.3
 - Top-P: 0.9
 - Frequency Penalty: 0.1
 - Presence Penalty: 0.1
 
-**Casos de Uso:**
+**Cases de Uso:**
 - Análisis técnico
-- Respuestas estructuradas
+- Responses estructuradas
 - Explicaciones detalladas
-- Contenido semi-estructurado
+- Content semi-estructurado
 
-**Ejemplo:**
+**Example:**
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=2)
 response = client.chat_completion([
@@ -61,19 +61,19 @@ response = client.chat_completion([
 
 **Descripción**: Equilibrio entre precisión y creatividad. Ideal para uso general.
 
-**Parámetros:**
+**Parameters:**
 - Temperatura: 0.7
 - Top-P: 0.9
 - Frequency Penalty: 0.5
 - Presence Penalty: 0.5
 
-**Casos de Uso:**
+**Cases de Uso:**
 - Conversaciones generales
 - Asistentes virtuales
-- Respuestas equilibradas
+- Responses equilibradas
 - Uso diario
 
-**Ejemplo:**
+**Example:**
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=3)  # Default
 response = client.chat_completion([
@@ -83,21 +83,21 @@ response = client.chat_completion([
 
 ### Nivel 4: Creativo (Alta Creatividad)
 
-**Descripción**: Respuestas creativas con mayor variación.
+**Descripción**: Responses creativas con mayor variación.
 
-**Parámetros:**
+**Parameters:**
 - Temperatura: 0.9
 - Top-P: 0.95
 - Frequency Penalty: 0.8
 - Presence Penalty: 0.8
 
-**Casos de Uso:**
+**Cases de Uso:**
 - Generación de contenido
 - Brainstorming
 - Ideas innovadoras
-- Contenido creativo
+- Content creativo
 
-**Ejemplo:**
+**Example:**
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=4)
 response = client.chat_completion([
@@ -107,21 +107,21 @@ response = client.chat_completion([
 
 ### Nivel 5: Libre (Máxima Creatividad)
 
-**Descripción**: Respuestas altamente creativas con máxima variación.
+**Descripción**: Responses altamente creativas con máxima variación.
 
-**Parámetros:**
+**Parameters:**
 - Temperatura: 1.0
 - Top-P: 1.0
 - Frequency Penalty: 1.0
 - Presence Penalty: 1.0
 
-**Casos de Uso:**
+**Cases de Uso:**
 - Generación artística
 - Ideas disruptivas
-- Contenido experimental
+- Content experimental
 - Exploración creativa
 
-**Ejemplo:**
+**Example:**
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=5)
 response = client.chat_completion([
@@ -133,15 +133,15 @@ response = client.chat_completion([
 
 | Nivel | Creatividad | Precisión | Variación | Uso Recomendado |
 |-------|-------------|-----------|-----------|-----------------|
-| 1 | Baja | Alta | Mínima | Datos factuales |
+| 1 | Baja | Alta | Mínima | Datas factuales |
 | 2 | Media-Baja | Alta | Baja | Análisis técnico |
 | 3 | Media | Media | Media | Uso general |
 | 4 | Media-Alta | Media-Baja | Alta | Generación de contenido |
 | 5 | Alta | Baja | Máxima | Creatividad pura |
 
-## 🔧 Implementación Técnica
+## 🔧 Implementation Técnica
 
-### Clase DeterminismController
+### Class DeterminismController
 
 ```python
 from determinism_controller import DeterminismController
@@ -161,7 +161,7 @@ description = controller.get_level_description()
 controller.set_level(2)
 ```
 
-### Diagrama de Clases
+### Diagrama de Classs
 
 ```mermaid
 classDiagram
@@ -188,19 +188,19 @@ classDiagram
 
 ```mermaid
 flowchart TD
-    A[Usuario] -->|Nivel| B[DeterminismController]
+    A[User] -->|Nivel| B[DeterminismController]
     B -->|Validar| C{¿Válido?}
-    C -->|Sí| D[Configurar Parámetros]
+    C -->|Sí| D[Configurar Parameters]
     C -->|No| E[Error: Nivel Inválido]
-    D -->|Parámetros| F[MistralAIClient]
+    D -->|Parameters| F[MistralAIClient]
     F -->|chat_completion| G[Mistral AI API]
-    G -->|Respuesta| F
-    F -->|Respuesta| A
+    G -->|Response| F
+    F -->|Response| A
 ```
 
-## 🎨 Ejemplos Prácticos
+## 🎨 Examples Prácticos
 
-### 1. Comparación de Respuestas
+### 1. Comparación de Responses
 
 ```python
 from mistral_client import MistralAIClient
@@ -241,7 +241,7 @@ creative_response = client.chat_completion([
 ])
 ```
 
-### 3. Sobrescritura de Parámetros
+### 3. Sobrescritura de Parameters
 
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=3)
@@ -253,9 +253,9 @@ response = client.chat_completion(
 )
 ```
 
-## 📊 Impacto en las Respuestas
+## 📊 Impacto en las Responses
 
-### Ejemplo: "Describe a cat"
+### Example: "Describe a cat"
 
 **Nivel 1 (Exacto):**
 "A cat is a small carnivorous mammal. It is the only domesticated species in the family Felidae."
@@ -266,9 +266,9 @@ response = client.chat_completion(
 **Nivel 5 (Creativo):**
 "Imagine a creature of elegance and mystery, with eyes that gleam like polished emeralds in the moonlight. The cat, a master of both grace and mischief, moves with the silence of a shadow and the curiosity of an eternal explorer. From the regal Siamese to the cuddly Maine Coon, each feline carries an air of ancient wisdom mixed with playful whimsy. They rule our homes with velvet paws, demanding affection one moment and independence the next. Truly, cats are the enchanting paradoxes of the animal kingdom."
 
-## 🔬 Casos de Uso Avanzados
+## 🔬 Cases de Uso Avanzados
 
-### 1. Sistema de Soporte Técnico
+### 1. System de Soporte Técnico
 
 ```python
 # Nivel 1 para respuestas precisas
@@ -285,7 +285,7 @@ response = tech_support_client.chat_completion([
 ])
 ```
 
-### 2. Generador de Contenido Creativo
+### 2. Generador de Content Creativo
 
 ```python
 # Nivel 5 para máxima creatividad
@@ -331,16 +331,16 @@ ideas = idea_generator.chat_completion([
 ])
 ```
 
-## 📈 Optimización de Parámetros
+## 📈 Optimización de Parameters
 
 ### Temperatura vs Top-P
 
 | Temperatura | Top-P | Efecto |
 |-------------|-------|--------|
-| 0.1 | 0.9 | Respuestas muy precisas, repetibles |
-| 0.3 | 0.9 | Respuestas enfocadas, baja variación |
+| 0.1 | 0.9 | Responses muy precisas, repetibles |
+| 0.3 | 0.9 | Responses enfocadas, baja variación |
 | 0.7 | 0.9 | Equilibrio entre creatividad y precisión |
-| 0.9 | 0.95 | Respuestas creativas, mayor variación |
+| 0.9 | 0.95 | Responses creativas, mayor variación |
 | 1.0 | 1.0 | Máxima creatividad, alta variación |
 
 ### Frequency Penalty vs Presence Penalty
@@ -353,7 +353,7 @@ ideas = idea_generator.chat_completion([
 
 ## 🎛️ Control Avanzado
 
-### 1. Ajuste Fino de Parámetros
+### 1. Ajuste Fino de Parameters
 
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=3)
@@ -414,7 +414,7 @@ for chunk in streaming_client.chat_completion_stream(messages):
 
 ## 📊 Métricas y Monitoreo
 
-### Monitoreo de Parámetros
+### Monitoreo de Parameters
 
 ```python
 client = MistralAIClient(api_key=api_key, determinism_level=3)
@@ -460,8 +460,8 @@ for level, data in results.items():
 
 - **Empieza con nivel 3**: Para la mayoría de los casos de uso
 - **Ajusta según necesidades**: Más bajo para precisión, más alto para creatividad
-- **Prueba diferentes niveles**: Compara resultados para tu caso específico
-- **Considera el contexto**: Tareas técnicas vs creativas
+- **Test diferentes niveles**: Compara resultados para tu caso específico
+- **Considera el contexto**: Tasks técnicas vs creativas
 
 ### 2. Consistencia vs Variación
 
@@ -475,21 +475,21 @@ for level, data in results.items():
 - **Niveles altos**: Más tokens, más creativo
 - **Monitorea el uso**: Ajusta según presupuesto
 
-### 4. Experiencia de Usuario
+### 4. Experiencia de User
 
-- **Interfaz clara**: Permite a los usuarios seleccionar nivel
+- **Interface clara**: Permite a los usuarios seleccionar nivel
 - **Descripciones claras**: Explica qué hace cada nivel
 - **Feedback visual**: Muestra el nivel actual
 
-## 🚀 Integración con Document QnA
+## 🚀 Integration con Document QnA
 
-### Ejemplo Completo
+### Example Completo
 
 ```python
 from document_manager import DocumentManager
 from mistral_client import MistralAIClient
 
-# Configuración
+# Configuration
 doc_manager = DocumentManager(api_key)
 
 # Subir documento
@@ -527,10 +527,10 @@ for i, (question, client) in enumerate(zip(questions, [exact_client, balanced_cl
 doc_manager.delete_document(file_info.id)
 ```
 
-## 📚 Recursos Adicionales
+## 📚 Resources Adicionales
 
-- [Documentación de Mistral AI](https://docs.mistral.ai/)
-- [Guía de Parámetros de Sampler](https://docs.mistral.ai/capabilities/completion/#sampling-parameters)
+- [Documentation de Mistral AI](https://docs.mistral.ai/)
+- [Guía de Parameters de Sampler](https://docs.mistral.ai/capabilities/completion/#sampling-parameters)
 - [Best Practices para LLM](https://docs.mistral.ai/guides/best-practices/)
 
 ## 🎯 Conclusión
@@ -540,6 +540,6 @@ El control de determinismo es una herramienta poderosa para:
 - ✅ **Controlar la creatividad**: Desde respuestas exactas hasta altamente creativas
 - ✅ **Optimizar resultados**: Según el contexto y necesidades
 - ✅ **Mejorar la experiencia**: Adaptando respuestas al usuario
-- ✅ **Reducir costos**: Usando niveles apropiados para cada tarea
+- ✅ **Networkucir costos**: Usando niveles apropiados para cada tarea
 
 **Recomendación final**: Empieza con nivel 3 (balanceado) y ajusta según tus necesidades específicas. Experimenta con diferentes niveles para encontrar el equilibrio perfecto entre precisión y creatividad para tu aplicación.

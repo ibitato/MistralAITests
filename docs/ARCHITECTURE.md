@@ -1,17 +1,17 @@
-# 🏗️ Arquitectura del Sistema Mistral AI Tests
+# 🏗️ Mistral AI Tests System Architecture
 
-## 📐 Visión General de la Arquitectura
+## 📐 Architecture Overview
 
-El sistema sigue una arquitectura modular y escalable basada en el patrón de diseño **Layered Architecture** con elementos de **Clean Architecture**. Está diseñado para ser mantenible, probable y fácil de extender.
+The system follows a modular and scalable architecture based on the **Layered Architecture** pattern with elements of **Clean Architecture**. It is designed to be maintainable, testable, and easy to extend.
 
 ```mermaid
 graph TD
-    A[Interfaz de Usuario] --> B[Capa de Aplicación]
-    B --> C[Capa de Dominio]
-    C --> D[Capa de Infraestructura]
+    A[User Interface] --> B[Application Layer]
+    B --> C[Domain Layer]
+    C --> D[Infrastructure Layer]
     D --> E[Mistral AI API]
-    D --> F[Sistema de Archivos]
-    D --> G[Base de Datos]
+    D --> F[File System]
+    D --> G[Database]
 
     style A fill:#f9f,stroke:#333
     style B fill:#bbf,stroke:#333
@@ -22,69 +22,69 @@ graph TD
     style G fill:#f99,stroke:#333
 ```
 
-## 🏗️ Capas de la Arquitectura
+## 🏗️ Architecture Layers
 
-### 1. Capa de Interfaz (Presentation Layer)
+### 1. Interface Layer (Presentation Layer)
 
-**Responsabilidad**: Interacción con el usuario y presentación de resultados
+**Responsibility**: User interaction and result presentation
 
-**Componentes:**
-- `src/example_determinism.py` - Ejemplo de determinismo
-- `src/example_document_qna.py` - Ejemplo de Document QnA
-- `main_examples.py` - Menú principal
+**Components:**
+- `src/example_determinism.py` - Determinism example
+- `src/example_document_qna.py` - Document QnA example
+- `main_examples.py` - Main menu
 
-**Tecnologías:**
+**Technologies:**
 - Python CLI
 - Text formatting
 - User input handling
 
-### 2. Capa de Aplicación (Application Layer)
+### 2. Application Layer (Application Layer)
 
-**Responsabilidad**: Coordinación de flujos de trabajo y lógica de negocio
+**Responsibility**: Workflow coordination and business logic
 
-**Componentes:**
-- `src/mistral_client.py` - Cliente principal
-- `src/document_manager.py` - Gestión de documentos
-- `src/determinism_controller.py` - Control de determinismo
+**Components:**
+- `src/mistral_client.py` - Main client
+- `src/document_manager.py` - Document management
+- `src/determinism_controller.py` - Determinism control
 
-**Tecnologías:**
+**Technologies:**
 - Python classes
 - Dependency injection
 - Error handling
 
-### 3. Capa de Dominio (Domain Layer)
+### 3. Domain Layer (Domain Layer)
 
-**Responsabilidad**: Lógica de negocio central y reglas
+**Responsibility**: Core business logic and rules
 
-**Componentes:**
-- `DeterminismController` - Lógica de determinismo
-- `DocumentManager` - Reglas de gestión de documentos
-- `MistralAIClient` - Lógica de interacción con API
+**Components:**
+- `DeterminismController` - Determinism logic
+- `DocumentManager` - Document management rules
+- `MistralAIClient` - API interaction logic
 
-**Tecnologías:**
+**Technologies:**
 - Python pure functions
 - Business rules
 - Domain models
 
-### 4. Capa de Infraestructura (Infrastructure Layer)
+### 4. Infrastructure Layer (Infrastructure Layer)
 
-**Responsabilidad**: Integración con sistemas externos
+**Responsibility**: Integration with external systems
 
-**Componentes:**
+**Components:**
 - Mistral AI API client
 - File system operations
 - HTTP requests
 
-**Tecnologías:**
+**Technologies:**
 - Mistral AI SDK
 - HTTPX
 - File I/O
 
-## 🔧 Patrones de Diseño
+## 🔧 Design Patterns
 
 ### 1. Strategy Pattern
 
-**Implementación**: `DeterminismController`
+**Implementation**: `DeterminismController`
 
 ```python
 class DeterminismController:
@@ -97,17 +97,17 @@ class DeterminismController:
             return ExactStrategy()
         elif self.level == 2:
             return FocusedStrategy()
-        # ... otros niveles
+        # ... other levels
 ```
 
-**Beneficios:**
-- Fácil de extender con nuevos niveles
-- Separación de algoritmos
-- Intercambiabilidad en tiempo de ejecución
+**Benefits:**
+- Easy to extend with new levels
+- Algorithm separation
+- Runtime interchangeability
 
 ### 2. Factory Pattern
 
-**Implementación**: Creación de clientes
+**Implementation**: Client creation
 
 ```python
 client = MistralAIClient(
@@ -117,14 +117,14 @@ client = MistralAIClient(
 )
 ```
 
-**Beneficios:**
-- Configuración flexible
-- Inyección de dependencias
-- Fácil de probar
+**Benefits:**
+- Flexible configuration
+- Dependency injection
+- Easy to test
 
 ### 3. Repository Pattern
 
-**Implementación**: `DocumentManager`
+**Implementation**: `DocumentManager`
 
 ```python
 doc_manager = DocumentManager(api_key)
@@ -132,30 +132,30 @@ documents = doc_manager.list_documents()
 file_info = doc_manager.upload_document("file.pdf")
 ```
 
-**Beneficios:**
-- Abstracción de almacenamiento
-- Operaciones CRUD consistentes
-- Fácil de mockear en pruebas
+**Benefits:**
+- Storage abstraction
+- Consistent CRUD operations
+- Easy to mock in tests
 
 ### 4. Observer Pattern
 
-**Implementación**: Streaming de respuestas
+**Implementation**: Response streaming
 
 ```python
 for chunk in client.chat_completion_stream(messages):
     print(chunk, end="", flush=True)
 ```
 
-**Beneficios:**
-- Procesamiento en tiempo real
-- Bajo consumo de memoria
-- Respuestas progresivas
+**Benefits:**
+- Real-time processing
+- Low memory usage
+- Progressive responses
 
-## 📦 Módulos Principales
+## 📦 Main Modules
 
 ### 1. `determinism_controller.py`
 
-**Diagrama de Clases:**
+**Class Diagram:**
 
 ```mermaid
 classDiagram
@@ -178,13 +178,13 @@ classDiagram
     DeterminismController --> DeterminismParameters
 ```
 
-**Flujos Principales:**
-1. Validación de nivel → Configuración de parámetros → Devolución de configuración
-2. Cambio de nivel → Revalidación → Actualización de parámetros
+**Main Flows:**
+1. Level validation → Parameter configuration → Configuration return
+2. Level change → Revalidation → Parameter update
 
 ### 2. `document_manager.py`
 
-**Diagrama de Secuencia (Subida de Documento):**
+**Sequence Diagram (Document Upload):**
 
 ```mermaid
 sequenceDiagram
@@ -201,15 +201,15 @@ sequenceDiagram
     DocumentManager-->>User: UploadFileOut
 ```
 
-**Operaciones CRUD:**
+**CRUD Operations:**
 - Create: `upload_document()`
 - Read: `list_documents()`, `get_document_info()`
-- Update: `get_signed_url()` (genera URL temporal)
+- Update: `get_signed_url()` (generates temporary URL)
 - Delete: `delete_document()`
 
 ### 3. `mistral_client.py`
 
-**Diagrama de Estados:**
+**State Diagram:**
 
 ```mermaid
 stateDiagram-v2
@@ -224,15 +224,15 @@ stateDiagram-v2
     Error --> Ready: Recovery
 ```
 
-**Métodos Principales:**
-- `chat_completion()`: Respuesta completa
-- `chat_completion_stream()`: Streaming en tiempo real
-- `chat_completion_with_metrics()`: Con métricas de rendimiento
-- `list_models()`: Obtener modelos disponibles
+**Main Methods:**
+- `chat_completion()`: Complete response
+- `chat_completion_stream()`: Real-time streaming
+- `chat_completion_with_metrics()`: With performance metrics
+- `list_models()`: Get available models
 
-## 🔌 Integración con Mistral AI
+## 🔌 Mistral AI Integration
 
-### Arquitectura de Integración
+### Integration Architecture
 
 ```mermaid
 graph LR
@@ -256,61 +256,61 @@ graph LR
     style G fill:#f69
 ```
 
-### Endpoints Utilizados
+### Endpoints Used
 
 1. **Chat Completions**: `POST /v1/chat/completions`
-   - Mensajes con contexto
-   - Streaming opcional
-   - Parámetros de determinismo
+   - Messages with context
+   - Optional streaming
+   - Determinism parameters
 
 2. **File Upload**: `POST /v1/files`
-   - Subida de documentos
-   - Validación de tamaño (max 512MB)
-   - Propósito específico (ocr, fine-tune, batch)
+   - Document upload
+   - Size validation (max 512MB)
+   - Specific purpose (ocr, fine-tune, batch)
 
 3. **File List**: `GET /v1/files`
-   - Listado de documentos
-   - Paginación
-   - Filtros por propósito
+   - Document listing
+   - Pagination
+   - Purpose filters
 
 4. **File Retrieve**: `GET /v1/files/{file_id}`
-   - Información de documento
-   - Metadatos
-   - Estado
+   - Document information
+   - Metadata
+   - Status
 
 5. **File Delete**: `DELETE /v1/files/{file_id}`
-   - Eliminación de documento
-   - Confirmación de eliminación
+   - Document deletion
+   - Deletion confirmation
 
 6. **Signed URL**: `GET /v1/files/{file_id}/url`
-   - URL temporal (max 24h)
-   - Acceso seguro
+   - Temporary URL (max 24h)
+   - Secure access
 
-## 📊 Flujo de Datos
+## 📊 Data Flow
 
 ### Document QnA Flow
 
 ```mermaid
 flowchart TD
-    A[Usuario] -->|Subir documento| B[DocumentManager]
+    A[User] -->|Upload document| B[DocumentManager]
     B -->|upload_document| C[Mistral AI API]
     C -->|FileSchema| B
     B -->|file_id| A
     
-    A -->|Pregunta + file_id| D[MistralAIClient]
+    A -->|Question + file_id| D[MistralAIClient]
     D -->|chat_completion| C
-    C -->|Respuesta| D
-    D -->|Respuesta| A
+    C -->|Response| D
+    D -->|Response| A
     
-    A -->|Listar documentos| B
+    A -->|List documents| B
     B -->|list_documents| C
-    C -->|Lista| B
-    B -->|Lista| A
+    C -->|List| B
+    B -->|List| A
     
-    A -->|Eliminar documento| B
+    A -->|Delete document| B
     B -->|delete_document| C
-    C -->|Confirmación| B
-    B -->|Confirmación| A
+    C -->|Confirmation| B
+    B -->|Confirmation| A
 
     style A fill:#f9f
     style B fill:#bbf
@@ -322,16 +322,16 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A[Usuario] -->|Nivel de determinismo| B[MistralAIClient]
+    A[User] -->|Determinism level| B[MistralAIClient]
     B -->|set_level| C[DeterminismController]
-    C -->|Validar nivel| D{¿Válido?}
-    D -->|Sí| E[Configurar parámetros]
-    D -->|No| F[Error: Nivel inválido]
+    C -->|Validate level| D{Valid?}
+    D -->|Yes| E[Configure parameters]
+    D -->|No| F[Error: Invalid level]
     
     E -->|temperature, top_p, etc| B
     B -->|chat_completion| G[Mistral AI API]
-    G -->|Respuesta| B
-    B -->|Respuesta| A
+    G -->|Response| B
+    B -->|Response| A
     
     style A fill:#f9f
     style B fill:#f96
@@ -342,66 +342,66 @@ flowchart TD
     style G fill:#99f
 ```
 
-## 🧪 Arquitectura de Pruebas
+## 🧪 Testing Architecture
 
-### Pirámide de Pruebas
+### Testing Pyramid
 
 ```mermaid
 graph TD
-    A[Pruebas Unitarias] -->|36 pruebas| B[Pruebas de Integración]
-    B -->|Flujos completos| C[Pruebas E2E]
+    A[Unit Tests] -->|36 tests| B[Integration Tests]
+    B -->|Complete flows| C[E2E Tests]
     
     style A fill:#9f9,stroke:#333
     style B fill:#99f,stroke:#333
     style C fill:#f99,stroke:#333
 ```
 
-### Estrategia de Testing
+### Testing Strategy
 
-1. **Pruebas Unitarias** (36 pruebas)
-   - Aislamiento completo con mocking
-   - Cobertura de todos los métodos públicos
-   - Validación de edge cases
+1. **Unit Tests** (36 tests)
+   - Complete isolation with mocking
+   - Coverage of all public methods
+   - Edge case validation
 
-2. **Pruebas de Integración**
-   - Flujos completos de trabajo
-   - Interacción entre módulos
-   - Pruebas con archivos reales
+2. **Integration Tests**
+   - Complete workflows
+   - Module interaction
+   - Tests with real files
 
-3. **Pruebas de Sistema**
-   - Ejemplos funcionales
-   - Integración con API real
-   - Validación de resultados
+3. **System Tests**
+   - Functional examples
+   - Real API integration
+   - Result validation
 
-### Herramientas de Testing
+### Testing Tools
 
-- **pytest**: Framework de pruebas
-- **pytest-mock**: Mocking avanzado
-- **pytest-cov**: Cobertura de código
-- **unittest.mock**: Mocking estándar
+- **pytest**: Testing framework
+- **pytest-mock**: Advanced mocking
+- **pytest-cov**: Code coverage
+- **unittest.mock**: Standard mocking
 
-## 📈 Métricas y Rendimiento
+## 📈 Quality and Performance Metrics
 
-### Métricas de Calidad
+### Quality Metrics
 
-- **Cobertura de código**: 34% global, 79-86% en módulos principales
-- **Pruebas pasando**: 36/36 (100%)
-- **Tiempo de ejecución**: ~0.8 segundos para todas las pruebas
-- **Calidad de código**: A (Ruff), 100% (Black)
+- **Code coverage**: 34% overall, 79-86% in main modules
+- **Passing tests**: 36/36 (100%)
+- **Execution time**: ~0.8 seconds for all tests
+- **Code quality**: A (Ruff), 100% (Black)
 
-### Métricas de Rendimiento
+### Performance Metrics
 
-| Operación | Tiempo Promedio | Tokens/s | Uso Típico |
-|-----------|----------------|----------|-------------|
-| Subida de documento | 2-5 segundos | - | Depende del tamaño |
-| Chat completion | 500-2000ms | 20-50 | Respuesta completa |
-| Streaming | 10-50ms/chunk | 5-15 | Respuesta progresiva |
-| Listar documentos | 100-300ms | - | Operación rápida |
-| Eliminar documento | 200-500ms | - | Operación rápida |
+| Operation | Average Time | Tokens/s | Typical Use |
+|-----------|--------------|----------|-------------|
+| Document upload | 2-5 seconds | - | Depends on size |
+| Chat completion | 500-2000ms | 20-50 | Complete response |
+| Streaming | 10-50ms/chunk | 5-15 | Progressive response |
+| List documents | 100-300ms | - | Fast operation |
+| Delete document | 200-500ms | - | Fast operation |
 
-## 🛡️ Seguridad
+## 🛡️ Security
 
-### Manejo de API Keys
+### API Key Management
 
 ```mermaid
 flowchart TD
@@ -417,56 +417,56 @@ flowchart TD
     style E fill:#99f
 ```
 
-### Validación de Entradas
+### Input Validation
 
-1. **API Key**: Formato y longitud
-2. **Nivel de determinismo**: Rango 1-5
-3. **Archivos**: Existencia, tamaño (max 512MB), tipo
-4. **Modelos**: Validez y disponibilidad
-5. **Mensajes**: Formato y contenido
+1. **API Key**: Format and length
+2. **Determinism level**: Range 1-5
+3. **Files**: Existence, size (max 512MB), type
+4. **Models**: Validity and availability
+5. **Messages**: Format and content
 
-### Manejo de Errores
+### Error Handling
 
 ```python
 try:
-    # Operación
+    # Operation
     result = client.chat_completion(messages)
 except ValueError as e:
-    # Error de validación
+    # Validation error
     logger.error(f"Validation error: {e}")
     raise
 except RuntimeError as e:
-    # Error de ejecución
+    # Runtime error
     logger.error(f"Runtime error: {e}")
     raise
 except Exception as e:
-    # Error inesperado
+    # Unexpected error
     logger.error(f"Unexpected error: {e}")
     raise RuntimeError(f"Operation failed: {e}") from e
 ```
 
-## 📁 Estructura de Directorios Recomendada
+## 📁 Recommended Directory Structure
 
 ```
 project/
-├── docs/              # Documentación
-├── src/               # Código fuente
-│   ├── core/          # Núcleo del sistema
-│   ├── services/      # Servicios
-│   ├── models/        # Modelos de datos
-│   └── utils/         # Utilidades
-├── tests/             # Pruebas
-│   ├── unit/          # Pruebas unitarias
-│   ├── integration/   # Pruebas de integración
-│   └── e2e/           # Pruebas end-to-end
-├── examples/          # Ejemplos
-├── scripts/           # Scripts utilitarios
-└── config/            # Configuración
+├── docs/              # Documentation
+├── src/               # Source code
+│   ├── core/          # System core
+│   ├── services/      # Services
+│   ├── models/        # Data models
+│   └── utils/         # Utilities
+├── tests/             # Tests
+│   ├── unit/          # Unit tests
+│   ├── integration/   # Integration tests
+│   └── e2e/           # End-to-end tests
+├── examples/          # Examples
+├── scripts/           # Utility scripts
+└── config/            # Configuration
 ```
 
-## 🚀 Escalabilidad
+## 🚀 Scalability
 
-### Escalabilidad Horizontal
+### Horizontal Scalability
 
 ```mermaid
 graph LR
@@ -485,21 +485,21 @@ graph LR
     style E fill:#f96
 ```
 
-### Escalabilidad Vertical
+### Vertical Scalability
 
-- **Aumento de recursos**: Más memoria para documentos grandes
-- **Optimización**: Cache de respuestas frecuentes
-- **Procesamiento por lotes**: Múltiples documentos simultáneos
+- **Resource increase**: More memory for large documents
+- **Optimization**: Cache for frequent responses
+- **Batch processing**: Multiple documents simultaneously
 
-## 🎯 Conclusión
+## 🎯 Conclusion
 
-La arquitectura del sistema Mistral AI Tests está diseñada para ser:
+The Mistral AI Tests system architecture is designed to be:
 
-- **✅ Modular**: Componentes independientes y reutilizables
-- **✅ Escalable**: Soporte para crecimiento y demanda
-- **✅ Mantenible**: Código limpio y bien documentado
-- **✅ Probable**: Cobertura completa de pruebas
-- **✅ Extensible**: Fácil de añadir nuevas características
-- **✅ Segura**: Validación y manejo de errores robusto
+- **✅ Modular**: Independent and reusable components
+- **✅ Scalable**: Support for growth and demand
+- **✅ Maintainable**: Clean and well-documented code
+- **✅ Testable**: Complete test coverage
+- **✅ Extensible**: Easy to add new features
+- **✅ Secure**: Robust validation and error handling
 
-Esta arquitectura permite una integración fluida con la API de Mistral AI mientras mantiene la flexibilidad para adaptarse a futuros requisitos y mejoras.
+This architecture enables seamless integration with the Mistral AI API while maintaining flexibility to adapt to future requirements and improvements.
