@@ -5,17 +5,17 @@ This script provides a menu to select and run different example scripts.
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 
-def clear_screen():
+def clear_screen() -> None:
     """Clear the terminal screen."""
     os.system("cls" if os.name == "nt" else "clear")
 
 
-def show_header():
+def show_header() -> None:
     """Show the main header."""
     print("🚀 Mistral AI Examples Runner")
     print("=" * 60)
@@ -23,7 +23,7 @@ def show_header():
     print("-" * 60)
 
 
-def get_available_examples():
+def get_available_examples() -> list[Path]:
     """Get list of available example scripts."""
     examples_dir = Path("src")
     examples = []
@@ -35,7 +35,7 @@ def get_available_examples():
     return sorted(examples)
 
 
-def get_available_tests():
+def get_available_tests() -> list[Path]:
     """Get list of available test scripts."""
     test_dir = Path(".")
     tests = []
@@ -47,7 +47,7 @@ def get_available_tests():
     return sorted(tests)
 
 
-def show_menu(examples):
+def show_menu(examples: list[Path]) -> None:
     """Show the menu of available examples."""
     for i, example in enumerate(examples, 1):
         # Remove 'example_' prefix and '.py' suffix for display
@@ -74,7 +74,7 @@ def show_menu(examples):
     print("-" * 60)
 
 
-def run_example(example_path):
+def run_example(example_path: Path) -> None:
     """Run a specific example script."""
     print(f"\n🔄 Running {example_path.name}...")
     print("=" * 60)
@@ -105,7 +105,7 @@ def run_example(example_path):
         print(f"\n❌ Error running {example_path.name}: {e}")
 
 
-def run_tests():
+def run_tests() -> None:
     """Run all available test scripts."""
     tests = get_available_tests()
 
@@ -200,7 +200,7 @@ def run_tests():
     print("🎉 All tests completed!")
 
 
-def main():
+def main() -> None:
     """Main function to run the examples menu."""
     clear_screen()
     show_header()
@@ -218,7 +218,7 @@ def main():
         try:
             tests = get_available_tests()
             max_option = len(examples) + 3 if tests else len(examples) + 2
-            choice = input("\n📋 Enter your choice (1-{}): ".format(max_option))
+            choice = input(f"\n📋 Enter your choice (1-{max_option}): ")
 
             if not choice.isdigit():
                 print("❌ Please enter a valid number")

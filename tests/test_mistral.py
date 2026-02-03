@@ -206,9 +206,7 @@ class TestMistralAIClient:
         mock_choice3.delta = mock_delta3
         mock_chunk3.choices = [mock_choice3]
 
-        mock_instance.chat.complete_stream.return_value = [
-            mock_chunk1, mock_chunk2, mock_chunk3
-        ]
+        mock_instance.chat.stream.return_value = [mock_chunk1, mock_chunk2, mock_chunk3]
 
         client = MistralAIClient(api_key="test_key")
         messages = [{"role": "user", "content": "Hello"}]
@@ -218,7 +216,7 @@ class TestMistralAIClient:
         assert chunks == ["Hello", " World", "!"]
 
         # Verify streaming was called with correct parameters
-        mock_instance.chat.complete_stream.assert_called_once()
+        mock_instance.chat.stream.assert_called_once()
 
     def test_chat_completion_with_metrics(self, mock_client):
         """Test chat completion with metrics method."""
@@ -232,12 +230,12 @@ class TestMistralAIClient:
         mock_choice = MagicMock()
         mock_choice.message = mock_message
         mock_response.choices = [mock_choice]
-        
+
         mock_usage = MagicMock()
         mock_usage.prompt_tokens = 10
         mock_usage.completion_tokens = 20
         mock_response.usage = mock_usage
-        
+
         mock_instance.chat.complete.return_value = mock_response
 
         client = MistralAIClient(api_key="test_key")
@@ -245,7 +243,7 @@ class TestMistralAIClient:
 
         # Test with metrics
         result = client.chat_completion_with_metrics(messages)
-        
+
         # Verify result structure
         assert "content" in result
         assert "duration" in result
@@ -254,7 +252,7 @@ class TestMistralAIClient:
         assert "level" in result
         assert "parameters" in result
         assert "metrics" in result
-        
+
         assert result["content"] == "Test response"
         assert result["tokens"]["total"] == 30
         assert result["tokens"]["prompt"] == 10
@@ -265,14 +263,14 @@ class TestMistralAIClient:
     def test_error_handling_empty_messages(self):
         """Test error handling for empty messages."""
         client = MistralAIClient(api_key="test_key")
-        
+
         # Test empty messages list
         with pytest.raises(ValueError, match="Messages list cannot be empty"):
             client.chat_completion([])
-            
+
         with pytest.raises(ValueError, match="Messages list cannot be empty"):
             list(client.chat_completion_stream([]))
-            
+
         with pytest.raises(ValueError, match="Messages list cannot be empty"):
             client.chat_completion_with_metrics([])
 
@@ -280,25 +278,27 @@ class TestMistralAIClient:
         """Test error handling for API failures."""
         mock_instance = MagicMock()
         mock_client.return_value = mock_instance
-        
+
         # Mock API exception
         mock_instance.chat.complete.side_effect = Exception("API Error")
-        
+
         client = MistralAIClient(api_key="test_key")
         messages = [{"role": "user", "content": "Test"}]
-        
+
         # Test error handling in regular completion
         with pytest.raises(RuntimeError, match="Failed to get chat completion"):
             client.chat_completion(messages)
-        
+
         # Test error handling in streaming
-        mock_instance.chat.complete_stream.side_effect = Exception("Streaming Error")
+        mock_instance.chat.stream.side_effect = Exception("Streaming Error")
         with pytest.raises(RuntimeError, match="Streaming failed"):
             list(client.chat_completion_stream(messages))
-        
+
         # Test error handling in metrics
         mock_instance.chat.complete.side_effect = Exception("Metrics Error")
-        with pytest.raises(RuntimeError, match="Failed to get chat completion with metrics"):
+        with pytest.raises(
+            RuntimeError, match="Failed to get chat completion with metrics"
+        ):
             client.chat_completion_with_metrics(messages)
 
 

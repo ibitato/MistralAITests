@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from mistralai import Mistral
 
 
-def test_mistral_medium():
+def test_mistral_medium() -> bool:
     """Test mistral-medium-latest model directly."""
     print("🧪 Testing mistral-medium-latest model...")
     print("=" * 60)
@@ -40,14 +40,15 @@ def test_mistral_medium():
         model = "mistral-large-latest"
         print(f"🔄 Testing model: {model}")
 
+        from mistralai.models import UserMessage
+        
+        messages = [
+            UserMessage(role="user", content="What is the best French cheese?"),
+        ]
+        
         chat_response = client.chat.complete(
             model=model,
-            messages=[
-                {
-                    "role": "user",
-                    "content": "What is the best French cheese?",
-                },
-            ],
+            messages=messages,  # type: ignore
         )
 
         print("✅ Request completed successfully")

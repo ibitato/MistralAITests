@@ -11,9 +11,9 @@ from dotenv import load_dotenv
 # Add the parent directory to the Python path to access src modules
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from determinism_controller import DeterminismController
-from mistral_client import MistralAIClient
-from utils import format_chat_message, validate_api_key
+from src.determinism_controller import DeterminismController
+from src.mistral_client import MistralAIClient
+from src.utils import format_chat_message, validate_api_key
 
 
 def main() -> None:
@@ -219,7 +219,10 @@ def main() -> None:
     print("-" * 80)
     streaming_messages = [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Write a short story about a robot learning to feel emotions."},
+        {
+            "role": "user",
+            "content": "Write a short story about a robot learning to feel emotions.",
+        },
     ]
     print(f"💬 System: {streaming_messages[0]['content']}")
     print(f"💬 User: {streaming_messages[1]['content']}")
@@ -227,7 +230,7 @@ def main() -> None:
     print("-" * 80)
     try:
         for chunk in client.chat_completion_stream(streaming_messages):
-            print(chunk, end='', flush=True)
+            print(chunk, end="", flush=True)
         print()  # New line after streaming
         print("✅ Streaming completed successfully!")
     except Exception as e:
@@ -246,11 +249,17 @@ def main() -> None:
         metrics_result = client.chat_completion_with_metrics(metrics_messages)
         print(f"💬 Response: {metrics_result['content']}")
         print(f"⏱️  Duration: {metrics_result['duration']:.3f} seconds")
-        print(f"💰 Tokens used: {metrics_result['tokens']['total']} total "
-              f"({metrics_result['tokens']['prompt']} prompt + {metrics_result['tokens']['completion']} completion)")
+        print(
+            f"💰 Tokens used: {metrics_result['tokens']['total']} total "
+            f"({metrics_result['tokens']['prompt']} prompt + {metrics_result['tokens']['completion']} completion)"
+        )
         print(f"📈 Tokens/second: {metrics_result['metrics']['tokens_per_second']:.1f}")
-        print(f"🕒 Response time: {metrics_result['metrics']['response_time_ms']:.1f} ms")
-        print(f"🎛️  Level: {metrics_result['level']} ({client.determinism_controller.get_level_description()})")
+        print(
+            f"🕒 Response time: {metrics_result['metrics']['response_time_ms']:.1f} ms"
+        )
+        print(
+            f"🎛️  Level: {metrics_result['level']} ({client.determinism_controller.get_level_description()})"
+        )
     except Exception as e:
         print(f"❌ Error with metrics: {e}")
 
