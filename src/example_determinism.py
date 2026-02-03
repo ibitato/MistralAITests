@@ -214,6 +214,46 @@ def main() -> None:
             print(f"❌ Error with fallback client: {fallback_e}")
             print("🔴 Unable to complete balanced client test")
 
+    # Test streaming functionality
+    print("\n🌊 Testing streaming functionality:")
+    print("-" * 80)
+    streaming_messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Write a short story about a robot learning to feel emotions."},
+    ]
+    print(f"💬 System: {streaming_messages[0]['content']}")
+    print(f"💬 User: {streaming_messages[1]['content']}")
+    print("📜 Streaming response:")
+    print("-" * 80)
+    try:
+        for chunk in client.chat_completion_stream(streaming_messages):
+            print(chunk, end='', flush=True)
+        print()  # New line after streaming
+        print("✅ Streaming completed successfully!")
+    except Exception as e:
+        print(f"❌ Error with streaming: {e}")
+
+    # Test metrics functionality
+    print("\n📊 Testing metrics functionality:")
+    print("-" * 80)
+    metrics_messages = [
+        {"role": "system", "content": "You are a concise assistant."},
+        {"role": "user", "content": "What is the capital of Spain?"},
+    ]
+    print(f"💬 System: {metrics_messages[0]['content']}")
+    print(f"💬 User: {metrics_messages[1]['content']}")
+    try:
+        metrics_result = client.chat_completion_with_metrics(metrics_messages)
+        print(f"💬 Response: {metrics_result['content']}")
+        print(f"⏱️  Duration: {metrics_result['duration']:.3f} seconds")
+        print(f"💰 Tokens used: {metrics_result['tokens']['total']} total "
+              f"({metrics_result['tokens']['prompt']} prompt + {metrics_result['tokens']['completion']} completion)")
+        print(f"📈 Tokens/second: {metrics_result['metrics']['tokens_per_second']:.1f}")
+        print(f"🕒 Response time: {metrics_result['metrics']['response_time_ms']:.1f} ms")
+        print(f"🎛️  Level: {metrics_result['level']} ({client.determinism_controller.get_level_description()})")
+    except Exception as e:
+        print(f"❌ Error with metrics: {e}")
+
     # Test with focused client (level 2)
     print("\n🔍 Testing focused client (level 2):")
     print("-" * 80)

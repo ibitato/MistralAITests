@@ -5,6 +5,11 @@ Test script to verify if mistral-medium-latest model works correctly.
 
 import os
 import sys
+from pathlib import Path
+
+# Add src directory to Python path
+sys.path.insert(0, str(Path(__file__).parent / "src"))
+
 from dotenv import load_dotenv
 from mistralai import Mistral
 

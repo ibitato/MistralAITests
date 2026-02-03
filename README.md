@@ -13,6 +13,10 @@ This project provides a scaffold for testing Mistral AI services using the offic
 - Type checking with mypy
 - Testing with pytest
 - Determinism controller for precise AI response control
+- **Streaming responses** for real-time output
+- **Performance metrics** tracking (tokens, duration, etc.)
+- Comprehensive error handling and validation
+- Multiple response modes (regular, streaming, with metrics)
 
 ## Setup
 
@@ -64,7 +68,53 @@ mypy .
 
 Run example with determinism control:
 ```bash
-python example_usage.py
+python src/example_determinism.py
+```
+
+## New Features
+
+### Streaming Responses
+
+Get real-time responses chunk by chunk:
+
+```python
+from src.mistral_client import MistralAIClient
+
+client = MistralAIClient(api_key="your_api_key")
+messages = [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "Tell me a story about AI."}
+]
+
+print("Streaming response:")
+for chunk in client.chat_completion_stream(messages):
+    print(chunk, end='', flush=True)
+```
+
+### Performance Metrics
+
+Get detailed metrics about your API calls:
+
+```python
+result = client.chat_completion_with_metrics(messages)
+print(f"Response: {result['content']}")
+print(f"Duration: {result['duration']:.3f} seconds")
+print(f"Tokens used: {result['tokens']['total']}")
+print(f"Response time: {result['metrics']['response_time_ms']:.1f} ms")
+```
+
+### Enhanced Error Handling
+
+```python
+try:
+    response = client.chat_completion([])  # Empty messages
+except ValueError as e:
+    print(f"Validation error: {e}")
+
+try:
+    response = client.chat_completion(messages)
+except RuntimeError as e:
+    print(f"API error: {e}")
 ```
 
 ## Project Structure
