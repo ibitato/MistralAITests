@@ -1,7 +1,10 @@
 # Mistral AI SDK
-mistralai>=1.11.0
+mistralai>=1.12.4
 python-dotenv>=1.0.0
 requests>=2.31.0
+
+# UI/Output
+colorama>=0.4.6
 
 # Testing
 pytest>=7.4.0

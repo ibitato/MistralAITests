@@ -1,11 +1,17 @@
 """
-Example script to test Mistral AI client functionality.
+Example script demonstrating Mistral AI determinism control.
+
+Shows how to control response determinism for consistent outputs.
 """
 
 import os
 import sys
+import time
+import logging
 import textwrap
+from typing import Optional
 
+from colorama import Fore, Style, init
 from dotenv import load_dotenv
 
 # Add the parent directory to the Python path to access src modules
@@ -15,25 +21,76 @@ from src.determinism_controller import DeterminismController
 from src.mistral_client import MistralAIClient
 from src.utils import format_chat_message, validate_api_key
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('determinism_demo.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Suppress mistralai SDK logs
+logging.getLogger("mistralai").setLevel(logging.WARNING)
+
+
+def print_header():
+    """Print standardized example header."""
+    print("\n" + "=" * 60)
+    print("🎛️  MISTRAL AI DETERMINISM CONTROL EXAMPLE")
+    print("=" * 60)
+    print("Demonstrates controlling response determinism for consistent outputs")
+    print("=" * 60 + "\n")
+
+
+def print_error(message: str, details: str = ""):
+    """Print standardized error message."""
+    print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
+    if details:
+        print(f"   {details}")
+
+
+def print_warning(message: str):
+    """Print standardized warning message."""
+    print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
+
+
+def print_success(message: str):
+    """Print standardized success message."""
+    print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
+
+
+# Import colorama at module level
+init(autoreset=True)
 
 def main() -> None:
-    """Main function to demonstrate Mistral AI client usage."""
-    print("🚀 Starting Mistral AI Client Demonstration")
-    print("=" * 80)
+    """Main function to demonstrate Mistral AI determinism control."""
+    start_time = time.time()
+    
+    logger.info("Starting determinism control example")
+    logger.info(f"Mistral AI Vibe CLI 2.2.1")
+    logger.info(f"Python {sys.version.split()[0]}")
+    
+    print_header()
 
-    # Load environment variables
+    # Step 1: Load and validate API key
+    print("1️⃣  Loading configuration...")
+    
     load_dotenv()
-
-    # Get API key from environment
     api_key = os.getenv("MISTRAL_AI_API_KEY")
 
-    # Validate API key
     if not validate_api_key(api_key):
-        print("❌ Invalid API key. Please check your .env file.")
+        print_error(
+            "MISTRAL_AI_API_KEY not found or invalid",
+            "Please set a valid API key in .env file"
+        )
+        logger.error("Invalid API key")
         return
-
-    print("✅ API key is valid")
-    print("-" * 80)
+    
+    print_success("API key validated")
+    logger.info("API key validated successfully")
 
     # Create client with default determinism level (3 - balanced)
     client = MistralAIClient(api_key=api_key, model="mistral-large-latest")
@@ -420,22 +477,40 @@ def main() -> None:
     print("  ✅ Successfully tested all determinism levels")
     print("  ✅ Demonstrated dynamic level switching")
     print("  ✅ Showed error handling for invalid levels")
-    print("  ✅ Tested with different models and clients")
-    print("  ✅ Showed independent controller usage")
-    print("\n🎉 Determinism controller integration complete!")
-    print(
-        "\n💡 Tip: Use determinism levels to control creativity vs. precision in your AI responses!"
-    )
-    print("\n📚 Level guide:")
-    print("  Level 1: Exact answers, minimal variation")
-    print("  Level 2: Focused responses, low creativity")
-    print("  Level 3: Balanced (default), good mix")
-    print("  Level 4: Creative responses, more variation")
-    print("  Level 5: Highly creative, maximum variation")
-    print("\n🎯 Ready to use determinism control in your Mistral AI applications!")
-    print("\n" + "=" * 80)
-    print("🚀 Demonstration Complete!")
-    print("=" * 80)
+    # Final summary
+    elapsed_time = time.time() - start_time
+    
+    print("\n" + "=" * 60)
+    print("✅ DETERMINISM EXAMPLE COMPLETED")
+    print("=" * 60)
+    
+    print("\n📊 Results:")
+    print("   • Determinism levels tested: 1-5")
+    print("   • Dynamic level switching: ✅")
+    print("   • Error handling: ✅")
+    print("   • Model compatibility: ✅")
+    print(f"   • Execution time: {elapsed_time:.2f} seconds")
+    
+    print("\n📚 Level Guide:")
+    print("   Level 1: Exact answers, minimal variation")
+    print("   Level 2: Focused responses, low creativity")
+    print("   Level 3: Balanced (default), good mix")
+    print("   Level 4: Creative responses, more variation")
+    print("   Level 5: Highly creative, maximum variation")
+    
+    print("\n💡 Best Practices:")
+    print("   • Use Level 1-2 for factual answers")
+    print("   • Use Level 3 for general conversation")
+    print("   • Use Level 4-5 for creative writing")
+    print("   • Adjust dynamically based on context")
+    
+    print("\n📖 Resources:")
+    print("   • Documentation: docs/API_INTEGRATION.md")
+    print("   • All Examples: python main_examples.py")
+    print("   • Mistral AI: https://mistral.ai")
+    
+    logger.info(f"Determinism example completed in {elapsed_time:.2f} seconds")
+    logger.info("All determinism levels tested successfully")
 
 
 if __name__ == "__main__":

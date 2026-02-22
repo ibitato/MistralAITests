@@ -1,11 +1,16 @@
 # Mistral AI Test Project
 
-This project provides a scaffold for testing Mistral AI services using the official Python SDK.
+This project provides a scaffold for testing Mistral AI services. All development and examples have been created using **Mistral AI Vibe CLI 2.2.1** and the **Devstral 2** model.
+
+**Powered by:**
+- 🤖 Mistral AI Vibe CLI 2.2.1
+- 🧠 Devstral 2 Model
 
 ## Features
 
 - Python 3.12+ environment with venv
-- Mistral AI SDK integration with determinism control
+- **Mistral AI Vibe CLI 2.2.1** integration with determinism control
+- **Devstral 2** model support
 - Git version control
 - Environment variable management with python-dotenv
 - Code formatting with Black
@@ -17,6 +22,8 @@ This project provides a scaffold for testing Mistral AI services using the offic
 - **Performance metrics** tracking (tokens, duration, etc.)
 - Comprehensive error handling and validation
 - Multiple response modes (regular, streaming, with metrics)
+- **Standardized output** with colorama for better UX
+- **Batch processing** with JSONL format support
 
 ## Setup
 
@@ -156,7 +163,33 @@ This project includes a determinism controller that allows fine-grained control 
 - **Level 4 (Creative):** More freedom and variation
 - **Level 5 (Free):** Highly creative, maximum variation
 
-The determinism controller automatically handles Mistral API requirements, such as setting `top_p=1.0` when using greedy sampling (`temperature=0.0`).
+The determinism controller automatically handles Mistral AI requirements, such as setting `top_p=1.0` when using greedy sampling (`temperature=0.0`).
+
+## 🎯 Development Credits
+
+This project and all examples were developed using:
+
+**Mistral AI Vibe CLI 2.2.1** - The powerful CLI tool that enabled rapid development and testing of Mistral AI services.
+
+**Devstral 2 Model** - The advanced language model that powers all the AI responses and demonstrations in this project.
+
+### About Mistral AI
+
+Mistral AI provides state-of-the-art language models and tools for building intelligent applications. This project demonstrates best practices for integrating with Mistral AI services using their official Python SDK and CLI tools.
+
+### Development Environment
+
+- **CLI Tool**: Mistral AI Vibe CLI 2.2.1
+- **Model**: Devstral 2
+- **SDK**: mistralai Python package
+- **Framework**: Python 3.12+
+
+### Developer
+
+**David R. Lopez B.**
+- Email: ibitato@gmail.com
+- GitHub: [davidlopezb](https://github.com/davidlopezb)
+- Role: Lead Developer & Architect
 
 ## License
 

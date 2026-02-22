@@ -2,7 +2,14 @@
 
 ## 🎯 Overview
 
-Este documento detalla cómo el sistema se integra con la API de Mistral AI, incluyendo endpoints, autenticación, manejo de errores y mejores prácticas.
+Este documento detalla cómo el sistema se integra con la API de Mistral AI usando **Mistral AI Vibe CLI 2.2.1**, incluyendo endpoints, autenticación, manejo de errores y mejores prácticas.
+
+**Desarrollado con:**
+- **Mistral AI Vibe CLI**: 2.2.1
+- **Modelo**: Devstral 2
+
+**Créditos:**
+Todos los ejemplos y desarrollos en este proyecto fueron creados utilizando las herramientas oficiales de Mistral AI, que proporcionan un entorno robusto y eficiente para trabajar con modelos de lenguaje.
 
 ## 📡 Autenticación
 
@@ -148,6 +155,94 @@ print(f"File ID: {file_info.id}")
 **Endpoint**: `GET https://api.mistral.ai/v1/files`
 
 **Parameters:**
+
+None (returns list of all uploaded files)
+
+**Response:**
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "file-123",
+      "object": "file",
+      "bytes": 102400,
+      "created_at": 1234567890,
+      "filename": "document.pdf",
+      "purpose": "ocr"
+    }
+  ]
+}
+```
+
+### 4. Batch Processing
+
+**Endpoint**: `POST https://api.mistral.ai/v1/batch/jobs`
+
+**Parameters:**
+
+- **Input File**: JSONL file containing batch requests
+- **Purpose**: `batch`
+
+**Batch Request Format (JSONL):**
+
+```json
+{"custom_id": "request_01", "body": {"max_tokens": 60, "messages": [{"role": "user", "content": "Explain quantum computing"}]}}
+{"custom_id": "request_02", "body": {"max_tokens": 60, "messages": [{"role": "user", "content": "Explain black holes"}]}}
+```
+
+**Requirements:**
+- Minimum: 1 request per batch
+- Maximum: 1,000 requests per batch
+- File format: JSONL (JSON Lines)
+- Each request must have unique `custom_id`
+
+**Response:**
+
+```json
+{
+  "id": "batch_job_123",
+  "object": "batch",
+  "status": "processing",
+  "request_count": 50,
+  "created_at": 1234567890
+}
+```
+
+**Implementation:**
+
+```python
+from example_batch_processing import create_batch_file, submit_batch_job
+
+# Create batch file with 50 requests
+create_batch_file("batch_requests.jsonl", num_requests=50)
+
+# Submit batch job
+client = Mistral(api_key=api_key)
+job_response = submit_batch_job(client, "batch_requests.jsonl")
+print(f"Batch job submitted: {job_response.id}")
+```
+
+**Job Status Monitoring:**
+
+```python
+# Monitor job status
+status = monitor_job_status(client, job_response.id)
+print(f"Job status: {status}")
+
+# Retrieve results when completed
+if status == "completed":
+    results = retrieve_results(client, job_response.id)
+    for result in results:
+        print(f"Request {result.custom_id}: {result.status}")
+```
+
+**Best Practices:**
+- Use batches of 50-1,000 requests for optimal performance
+- Include error handling for job monitoring
+- Clean up batch files after processing
+- Use unique custom_ids for tracking
 
 - `page`: Número de página (default: 0)
 - `page_size`: Tamaño de página (default: 100)

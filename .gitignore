@@ -62,6 +62,12 @@ Thumbs.db
 mistral_cache/
 *.mistral
 
+# Test data - ignore all except permanent dataset
+tests/test_data/
+!tests/test_data/example_batch_50.jsonl
+*.jsonl
+batch_*.jsonl
+
 # Jupyter notebooks
 .ipynb_checkpoints/
 *.ipynb
