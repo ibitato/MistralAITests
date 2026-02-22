@@ -20,6 +20,7 @@ from typing import Optional
 import sys
 from dotenv import load_dotenv
 from mistralai import Mistral
+from document_manager import DocumentManager
 
 # Configure logging
 logging.basicConfig(
@@ -416,11 +417,12 @@ def main() -> None:
 
     # Submit batch job
     print("\n📤 Submitting batch job to Mistral AI...")
+    uploaded_file_id = None
     try:
         job_response = submit_batch_job(client, batch_file, api_key)
-        file_id = job_response.get('id', 'unknown')
+        uploaded_file_id = job_response.get('id', 'unknown')
         print(f"✅ Batch file uploaded successfully")
-        print(f"   File ID: {file_id}")
+        print(f"   File ID: {uploaded_file_id}")
         print(f"   Status: {job_response.get('status', 'uploaded')}")
         print(f"   Purpose: {job_response.get('purpose', 'batch')}")
     except Exception as e:
@@ -432,14 +434,14 @@ def main() -> None:
     print("   This may take several minutes for 50 requests...")
     print("   Status: ", end="", flush=True)
     
-    status = monitor_job_status(api_key, file_id)
+    status = monitor_job_status(api_key, uploaded_file_id)
     print(f"\n📊 Final processing status: {status}")
 
     if status == "completed":
         # Retrieve results
         print("\n📥 Processing batch requests...")
         try:
-            results = retrieve_results(api_key, client, file_id)
+            results = retrieve_results(api_key, client, uploaded_file_id)
             print(f"✅ Processed {len(results)} demo results")
             
             # Display summary
@@ -457,12 +459,32 @@ def main() -> None:
 
     # Step 5: Cleanup
     print("\n5️⃣  Cleaning up...")
-    if cleanup_batch_file(batch_file):
-        print_success("Temporary files cleaned up")
-        logger.info("Cleanup completed successfully")
+    
+    # Cleanup local file
+    local_cleanup_success = cleanup_batch_file(batch_file)
+    
+    # Cleanup remote file from Mistral AI
+    remote_cleanup_success = False
+    if uploaded_file_id and uploaded_file_id != 'unknown':
+        try:
+            doc_manager = DocumentManager(api_key)
+            remote_cleanup_success = doc_manager.delete_document(uploaded_file_id)
+            if remote_cleanup_success:
+                print(f"   ✅ Remote file {uploaded_file_id} deleted from Mistral AI")
+                logger.info(f"Remote file cleanup successful: {uploaded_file_id}")
+            else:
+                print_warning(f"Remote file cleanup may have failed for {uploaded_file_id}")
+                logger.warning(f"Remote file cleanup may have failed: {uploaded_file_id}")
+        except Exception as e:
+            print_warning(f"Error deleting remote file: {str(e)}")
+            logger.error(f"Error deleting remote file {uploaded_file_id}: {str(e)}")
+    
+    if local_cleanup_success:
+        print_success("Local temporary files cleaned up")
+        logger.info("Local cleanup completed successfully")
     else:
-        print_warning("Cleanup may have failed")
-        logger.warning("Cleanup may have failed")
+        print_warning("Local cleanup may have failed")
+        logger.warning("Local cleanup may have failed")
 
     # Summary
     print("\n" + "=" * 60)
@@ -473,7 +495,7 @@ def main() -> None:
     print("   • Batch file: tests/test_data/example_batch_50.jsonl")
     print("   • Format: JSONL (50 requests)")
     print("   • Location: tests/test_data/")
-    print("   • Cleanup: All temporary files removed")
+    print("   • Cleanup: Local and remote files removed")
     
     print("\n📚 Resources:")
     print("   • Documentation: docs/API_INTEGRATION.md")
