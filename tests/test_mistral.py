@@ -3,7 +3,7 @@ Test cases for Mistral AI client.
 """
 
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, mock_open
 
 import pytest
 
@@ -839,3 +839,220 @@ class TestToolCalling:
         assert "error" in content
         assert content["success"] is False
         assert "invalid" in content["error"].lower()
+
+
+class TestVisionCapabilities:
+    """Test cases for vision functionality."""
+
+    @pytest.fixture
+    def mock_client(self):
+        """Create a mock Mistral client."""
+        with patch("src.mistral_client.Mistral") as mock:
+            yield mock
+
+    @pytest.fixture
+    def mock_vision_response(self):
+        """Create mock vision API response."""
+        mock_response = MagicMock()
+        mock_message = MagicMock()
+        mock_message.content = "This image shows the Eiffel Tower in Paris, France. It's a famous landmark built in 1889 for the World's Fair. The tower is 330 meters tall and is one of the most recognizable structures in the world."
+        mock_choice = MagicMock()
+        mock_choice.message = mock_message
+        mock_response.choices = [mock_choice]
+
+        mock_usage = MagicMock()
+        mock_usage.prompt_tokens = 50
+        mock_usage.completion_tokens = 150
+        mock_response.usage = mock_usage
+
+        return mock_response
+
+    def test_vision_analysis_basic(self, mock_client, mock_vision_response):
+        """Test basic image analysis."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.return_value = mock_vision_response
+
+        client = MistralAIClient(api_key="test_key")
+        
+        # Use binary data to avoid file path issues
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            result = client.vision_analysis(
+                image_data=b"fake_image_bytes",
+                prompt="Describe this image"
+            )
+
+        assert "content" in result
+        assert "duration" in result
+        assert "tokens" in result
+        assert "model" in result
+        assert "level" in result
+        assert "parameters" in result
+        assert "detail" in result
+
+        assert result["content"].startswith("This image shows")
+        assert result["tokens"]["total"] == 200
+        assert result["detail"] == "high"  # default
+
+    def test_vision_analysis_validation(self, mock_client):
+        """Test input validation."""
+        client = MistralAIClient(api_key="test_key")
+
+        # Test empty image data
+        with pytest.raises(ValueError, match="Image data cannot be empty"):
+            client.vision_analysis("", "Describe")
+
+        # Test invalid detail level
+        with pytest.raises(ValueError, match="Invalid detail level"):
+            client.vision_analysis("test.jpg", detail="invalid")
+
+    def test_vision_analysis_image_formats(self, mock_client, mock_vision_response):
+        """Test different image input formats."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.return_value = mock_vision_response
+
+        client = MistralAIClient(api_key="test_key")
+
+        # Test URL format
+        result = client.vision_analysis(
+            image_data="https://example.com/image.jpg",
+            prompt="Describe"
+        )
+        assert result["content"].startswith("This image shows")
+
+        # Test file path format - mock both file existence and reading
+        with patch("os.path.exists", return_value=True), \
+             patch("builtins.open", mock_open(read_data=b"fake_image_data")):
+            result = client.vision_analysis(
+                image_data="test.jpg",
+                prompt="Describe"
+            )
+            assert result["content"].startswith("This image shows")
+
+        # Test binary data format
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            result = client.vision_analysis(
+                image_data=b"fake_image_bytes",
+                prompt="Describe"
+            )
+            assert result["content"].startswith("This image shows")
+
+    def test_vision_analysis_detail_levels(self, mock_client, mock_vision_response):
+        """Test different detail levels."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.return_value = mock_vision_response
+
+        client = MistralAIClient(api_key="test_key")
+
+        # Use binary data to avoid file path issues
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            
+            for detail_level in ["low", "high", "auto"]:
+                result = client.vision_analysis(
+                    image_data=b"fake_image_bytes",
+                    prompt="Describe",
+                    detail=detail_level
+                )
+                assert result["detail"] == detail_level
+                assert result["content"].startswith("This image shows")
+
+    def test_vision_with_text(self, mock_client, mock_vision_response):
+        """Test multimodal conversation."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.return_value = mock_vision_response
+
+        client = MistralAIClient(api_key="test_key")
+        messages = [{"role": "user", "content": "What's in this image?"}]
+
+        # Use binary data to avoid file path issues
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            result = client.vision_with_text(
+                messages=messages,
+                image_data=b"fake_image_bytes"
+            )
+
+        assert result["content"].startswith("This image shows")
+        assert result["tokens"]["total"] == 200
+
+    def test_vision_with_text_validation(self, mock_client):
+        """Test multimodal conversation validation."""
+        client = MistralAIClient(api_key="test_key")
+
+        # Test empty messages
+        with pytest.raises(ValueError, match="Messages list cannot be empty"):
+            client.vision_with_text([], "test.jpg")
+
+        # Test empty image data
+        with pytest.raises(ValueError, match="Image data cannot be empty"):
+            client.vision_with_text([{"role": "user", "content": "test"}], "")
+
+    def test_vision_error_handling(self, mock_client):
+        """Test error handling."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.side_effect = Exception("Vision API error")
+
+        client = MistralAIClient(api_key="test_key")
+
+        # Use binary data to avoid file path issues
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            with pytest.raises(RuntimeError, match="Failed to process vision request"):
+                client.vision_analysis(b"fake_image_bytes", "Describe")
+
+    def test_vision_with_text_error_handling(self, mock_client):
+        """Test multimodal error handling."""
+        mock_instance = MagicMock()
+        mock_client.return_value = mock_instance
+        mock_instance.chat.complete.side_effect = Exception("Multimodal API error")
+
+        client = MistralAIClient(api_key="test_key")
+
+        # Use binary data to avoid file path issues
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            with pytest.raises(RuntimeError, match="Failed to process multimodal vision request"):
+                client.vision_with_text(
+                    [{"role": "user", "content": "test"}],
+                    b"fake_image_bytes"
+                )
+
+    def test_prepare_image_data_validation(self, mock_client):
+        """Test image data preparation validation."""
+        client = MistralAIClient(api_key="test_key")
+
+        # Test empty data
+        with pytest.raises(ValueError, match="Image data cannot be empty"):
+            client._prepare_image_data("")
+
+        # Test unsupported format
+        with pytest.raises(ValueError, match="Unsupported image data format"):
+            client._prepare_image_data(12345)
+
+    def test_prepare_image_data_formats(self, mock_client):
+        """Test image data preparation for different formats."""
+        client = MistralAIClient(api_key="test_key")
+
+        # Test URL (should return unchanged)
+        url = "https://example.com/image.jpg"
+        result = client._prepare_image_data(url)
+        assert result == url
+
+        # Test file path (mock both existence and file reading)
+        with patch("os.path.exists", return_value=True), \
+             patch("builtins.open", mock_open(read_data=b"fake_image_data")):
+            result = client._prepare_image_data("test.jpg")
+            assert result.startswith("data:image/jpeg;base64,")
+
+        # Test binary data
+        with patch("base64.b64encode") as mock_b64:
+            mock_b64.return_value = b"fake_base64"
+            result = client._prepare_image_data(b"fake_image_bytes")
+            assert result.startswith("data:image/jpeg;base64,")

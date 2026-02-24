@@ -4,6 +4,7 @@ Mistral AI Client Module
 This module provides a client for interacting with Mistral AI services.
 """
 
+import base64
 import json
 import logging
 import os
@@ -625,3 +626,331 @@ class MistralAIClient:
             "tokens_used": final_response["tokens"]["total"],
             "duration": final_response["duration"],
         }
+
+    def _prepare_image_data(self, image_data: Union[str, bytes]) -> str:
+        """Prepare image data for vision API.
+
+        Args:
+            image_data: Image file path, URL, or binary data
+
+        Returns:
+            Base64 encoded image data or URL
+
+        Raises:
+            ValueError: If image data is invalid or unsupported format
+        """
+        if not image_data or (isinstance(image_data, str) and not image_data.strip()):
+            raise ValueError("Image data cannot be empty")
+
+        # If it's already a URL, return as-is
+        if isinstance(image_data, str) and (image_data.startswith("http://") or image_data.startswith("https://")):
+            return image_data
+
+        # If it's a file path, read the file
+        if isinstance(image_data, str) and os.path.exists(image_data):
+            try:
+                with open(image_data, "rb") as image_file:
+                    image_data = image_file.read()
+            except IOError as e:
+                raise ValueError(f"Could not read image file: {str(e)}") from e
+
+        # If it's binary data, encode as base64
+        if isinstance(image_data, bytes):
+            try:
+                # Convert to base64
+                return f"data:image/jpeg;base64,{base64.b64encode(image_data).decode('utf-8')}"
+            except Exception as e:
+                raise ValueError(f"Could not encode image data: {str(e)}") from e
+
+        raise ValueError("Unsupported image data format. Provide file path, URL, or binary data.")
+
+    def vision_analysis(
+        self,
+        image_data: Union[str, bytes],
+        prompt: str = "",
+        temperature: float | None = None,
+        determinism_level: int | None = None,
+        detail: str = "high"
+    ) -> dict[str, Any]:
+        """Analyze images with vision capabilities.
+
+        Args:
+            image_data: Image file path, URL, or binary data
+            prompt: Optional text prompt for multimodal analysis
+            temperature: Creativity level (0.0 to 1.0), optional
+            determinism_level: Determinism level (1-5), optional
+            detail: Analysis detail level ("low", "high", "auto")
+
+        Returns:
+            Dictionary containing:
+            - content: Analysis results
+            - duration: Request duration in seconds
+            - tokens: Token usage information
+            - model: Model used
+            - level: Determinism level used
+            - parameters: Parameters used
+
+        Raises:
+            ValueError: If inputs are invalid
+            RuntimeError: If API request fails
+        """
+        # Validate image data
+        if not image_data or (isinstance(image_data, str) and not image_data.strip()):
+            raise ValueError("Image data cannot be empty")
+
+        # Validate detail level
+        valid_detail_levels = ["low", "high", "auto"]
+        if detail not in valid_detail_levels:
+            raise ValueError(f"Invalid detail level. Must be one of: {valid_detail_levels}")
+
+        # Prepare image data
+        try:
+            prepared_image = self._prepare_image_data(image_data)
+        except ValueError as e:
+            raise ValueError(f"Invalid image data: {str(e)}") from e
+
+        # Use the specified determinism level or fall back to client default
+        level = (
+            determinism_level
+            if determinism_level is not None
+            else self.determinism_level
+        )
+
+        # Update determinism controller level if different from current
+        if level != self.determinism_controller.level:
+            self.determinism_controller.set_level(level)
+
+        params = self.determinism_controller.get_parameters()
+
+        # If temperature is explicitly provided, override the level's temperature
+        if temperature is not None:
+            params["temperature"] = temperature
+            # When temperature is 0 (greedy sampling), Mistral API requires top_p=1
+            if temperature == 0.0:
+                params["top_p"] = 1.0
+
+        start_time = time.time()
+
+        try:
+            # Prepare messages for vision API
+            messages = []
+            
+            # Add system message if there's a prompt
+            if prompt:
+                messages.append({
+                    "role": "user",
+                    "content": prompt
+                })
+            
+            # Add image message
+            if prepared_image.startswith("http"):
+                # URL format
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": prepared_image
+                            }
+                        }
+                    ]
+                })
+            else:
+                # Base64 format
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": prepared_image
+                            }
+                        }
+                    ]
+                })
+
+            # Call vision API
+            chat_response = self.client.chat.complete(
+                model=self.model,
+                messages=messages,
+                **params
+            )
+
+            duration = time.time() - start_time
+
+            if not chat_response.choices or len(chat_response.choices) == 0:
+                raise RuntimeError("API returned empty choices")
+
+            choice = chat_response.choices[0]
+            message = choice.message
+
+            # Extract content
+            content = message.content if message.content else ""
+
+            # Calculate token usage
+            prompt_tokens = (
+                chat_response.usage.prompt_tokens if chat_response.usage else 0
+            )
+            completion_tokens = (
+                chat_response.usage.completion_tokens if chat_response.usage else 0
+            )
+            total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
+
+            return {
+                "content": content,
+                "duration": duration,
+                "tokens": {
+                    "total": total_tokens,
+                    "prompt": prompt_tokens,
+                    "completion": completion_tokens,
+                },
+                "model": self.model,
+                "level": level,
+                "parameters": params,
+                "detail": detail
+            }
+
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to process vision request: {str(e)}"
+            ) from e
+
+    def vision_with_text(
+        self,
+        messages: list[Any],
+        image_data: Union[str, bytes],
+        temperature: float | None = None,
+        determinism_level: int | None = None
+    ) -> dict[str, Any]:
+        """Multimodal conversation with vision and text.
+
+        Args:
+            messages: Chat messages (can include text and image references)
+            image_data: Image to analyze
+            temperature: Creativity level (0.0 to 1.0), optional
+            determinism_level: Determinism level (1-5), optional
+
+        Returns:
+            Dictionary with response and metrics
+
+        Raises:
+            ValueError: If inputs are invalid
+            RuntimeError: If API request fails
+        """
+        # Validate messages
+        if not messages or len(messages) == 0:
+            raise ValueError("Messages list cannot be empty")
+
+        # Validate image data
+        if not image_data or (isinstance(image_data, str) and not image_data.strip()):
+            raise ValueError("Image data cannot be empty")
+
+        # Prepare image data
+        try:
+            prepared_image = self._prepare_image_data(image_data)
+        except ValueError as e:
+            raise ValueError(f"Invalid image data: {str(e)}") from e
+
+        # Use the specified determinism level or fall back to client default
+        level = (
+            determinism_level
+            if determinism_level is not None
+            else self.determinism_level
+        )
+
+        # Update determinism controller level if different from current
+        if level != self.determinism_controller.level:
+            self.determinism_controller.set_level(level)
+
+        params = self.determinism_controller.get_parameters()
+
+        # If temperature is explicitly provided, override the level's temperature
+        if temperature is not None:
+            params["temperature"] = temperature
+            # When temperature is 0 (greedy sampling), Mistral API requires top_p=1
+            if temperature == 0.0:
+                params["top_p"] = 1.0
+
+        start_time = time.time()
+
+        try:
+            # Prepare multimodal messages
+            multimodal_messages = []
+            
+            # Add existing text messages
+            for message in messages:
+                multimodal_messages.append(message)
+
+            # Add image message
+            if prepared_image.startswith("http"):
+                # URL format
+                multimodal_messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": prepared_image
+                            }
+                        }
+                    ]
+                })
+            else:
+                # Base64 format
+                multimodal_messages.append({
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": prepared_image
+                            }
+                        }
+                    ]
+                })
+
+            # Call vision API
+            chat_response = self.client.chat.complete(
+                model=self.model,
+                messages=multimodal_messages,
+                **params
+            )
+
+            duration = time.time() - start_time
+
+            if not chat_response.choices or len(chat_response.choices) == 0:
+                raise RuntimeError("API returned empty choices")
+
+            choice = chat_response.choices[0]
+            message = choice.message
+
+            # Extract content
+            content = message.content if message.content else ""
+
+            # Calculate token usage
+            prompt_tokens = (
+                chat_response.usage.prompt_tokens if chat_response.usage else 0
+            )
+            completion_tokens = (
+                chat_response.usage.completion_tokens if chat_response.usage else 0
+            )
+            total_tokens = (prompt_tokens or 0) + (completion_tokens or 0)
+
+            return {
+                "content": content,
+                "duration": duration,
+                "tokens": {
+                    "total": total_tokens,
+                    "prompt": prompt_tokens,
+                    "completion": completion_tokens,
+                },
+                "model": self.model,
+                "level": level,
+                "parameters": params
+            }
+
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to process multimodal vision request: {str(e)}"
+            ) from e
