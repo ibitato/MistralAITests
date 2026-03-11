@@ -436,8 +436,23 @@ class MistralAIClient:
             chat_response = self.client.chat.complete(
                 model=self.model,
                 messages=messages,
-                tools=tools,
-                tool_choice=tool_choice,
+                tools=(
+                    [
+                        tool.model_dump() if hasattr(tool, "model_dump") else tool
+                        for tool in tools
+                    ]
+                    if tools
+                    else None
+                ),
+                tool_choice=(
+                    tool_choice
+                    if isinstance(tool_choice, str)
+                    else (
+                        tool_choice.get("type")
+                        if isinstance(tool_choice, dict)
+                        else "auto"
+                    )
+                ),
                 **params,
             )
 

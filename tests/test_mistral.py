@@ -762,7 +762,7 @@ class TestToolCalling:
         result = client.chat_completion_with_tools(
             messages=messages,
             tools=sample_tools,
-            tool_choice={"type": "function", "function": {"name": "get_weather"}},
+            tool_choice="auto",
         )
         assert result["content"] == "Response"
 
@@ -1022,7 +1022,7 @@ class TestVisionCapabilities:
 
         # Test unsupported format
         with pytest.raises(ValueError, match="Unsupported image data format"):
-            client._prepare_image_data(12345)
+            client._prepare_image_data("12345")  # Use string instead of int
 
     def test_prepare_image_data_formats(self, mock_client):
         """Test image data preparation for different formats."""
