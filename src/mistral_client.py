@@ -10,11 +10,20 @@ import logging
 import os
 import time
 from collections.abc import Callable, Generator
-from typing import Any
+from typing import Any, Literal
 
 from dotenv import load_dotenv
 from mistralai import Mistral
-from mistralai.models import Function
+from mistralai.models import (
+    Function,
+    Tool,
+    AssistantMessage,
+    SystemMessage,
+    UserMessage,
+    ToolMessage,
+    ImageURLChunk,
+    ImageURL,
+)
 
 from src.determinism_controller import DeterminismController
 
@@ -433,26 +442,30 @@ class MistralAIClient:
         start_time = time.time()
 
         try:
+            # Convert tools to proper format
+            tools_list = None
+            if tools:
+                tools_list = [
+                    (
+                        Tool(type="function", function=tool)
+                        if isinstance(tool, Function)
+                        else tool
+                    )
+                    for tool in tools
+                ]
+
+            # Convert tool_choice to proper literal type
+            tool_choice_str: Literal["auto", "none", "any", "required"] = "auto"
+            if isinstance(tool_choice, str):
+                tool_choice_str = tool_choice  # type: ignore
+            elif isinstance(tool_choice, dict):
+                tool_choice_str = "auto"  # Simplified for mypy
+
             chat_response = self.client.chat.complete(
                 model=self.model,
                 messages=messages,
-                tools=(
-                    [
-                        tool.model_dump() if hasattr(tool, "model_dump") else tool
-                        for tool in tools
-                    ]
-                    if tools
-                    else None
-                ),
-                tool_choice=(
-                    tool_choice
-                    if isinstance(tool_choice, str)
-                    else (
-                        tool_choice.get("type")
-                        if isinstance(tool_choice, dict)
-                        else "auto"
-                    )
-                ),
+                tools=tools_list,
+                tool_choice=tool_choice_str,
                 **params,
             )
 
@@ -810,32 +823,30 @@ class MistralAIClient:
 
         try:
             # Prepare messages for vision API
-            messages = []
+            messages: list[
+                SystemMessage | UserMessage | AssistantMessage | ToolMessage
+            ] = []
 
             # Add system message if there's a prompt
             if prompt:
-                messages.append({"role": "user", "content": prompt})
+                messages.append(UserMessage(role="user", content=prompt))
 
             # Add image message
             if prepared_image.startswith("http"):
                 # URL format
                 messages.append(
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": prepared_image}}
-                        ],
-                    }
+                    UserMessage(
+                        role="user",
+                        content=[ImageURLChunk(image_url=ImageURL(url=prepared_image))],
+                    )
                 )
             else:
                 # Base64 format
                 messages.append(
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": prepared_image}}
-                        ],
-                    }
+                    UserMessage(
+                        role="user",
+                        content=[ImageURLChunk(image_url=ImageURL(url=prepared_image))],
+                    )
                 )
 
             # Call vision API
@@ -940,32 +951,41 @@ class MistralAIClient:
 
         try:
             # Prepare multimodal messages
-            multimodal_messages = []
+            multimodal_messages: list[
+                SystemMessage | UserMessage | AssistantMessage | ToolMessage
+            ] = []
 
             # Add existing text messages
             for message in messages:
-                multimodal_messages.append(message)
+                if isinstance(message, dict):
+                    # Convert dict messages to proper types
+                    if message.get("role") == "system":
+                        multimodal_messages.append(SystemMessage(**message))
+                    elif message.get("role") == "user":
+                        multimodal_messages.append(UserMessage(**message))
+                    elif message.get("role") == "assistant":
+                        multimodal_messages.append(AssistantMessage(**message))
+                    elif message.get("role") == "tool":
+                        multimodal_messages.append(ToolMessage(**message))
+                else:
+                    multimodal_messages.append(message)
 
             # Add image message
             if prepared_image.startswith("http"):
                 # URL format
                 multimodal_messages.append(
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": prepared_image}}
-                        ],
-                    }
+                    UserMessage(
+                        role="user",
+                        content=[ImageURLChunk(image_url=ImageURL(url=prepared_image))],
+                    )
                 )
             else:
                 # Base64 format
                 multimodal_messages.append(
-                    {
-                        "role": "user",
-                        "content": [
-                            {"type": "image_url", "image_url": {"url": prepared_image}}
-                        ],
-                    }
+                    UserMessage(
+                        role="user",
+                        content=[ImageURLChunk(image_url=ImageURL(url=prepared_image))],
+                    )
                 )
 
             # Call vision API
