@@ -1,5 +1,16 @@
 # Mistral AI Test Project
 
+[![CI Status](https://img.shields.io/github/actions/workflow/status/ibitato/MistralAITests/ci.yml?branch=master&label=CI&style=flat-square)](https://github.com/ibitato/MistralAITests/actions/workflows/ci.yml)
+[![Code Quality](https://img.shields.io/github/actions/workflow/status/ibitato/MistralAITests/code-quality.yml?branch=master&label=Code%20Quality&style=flat-square)](https://github.com/ibitato/MistralAITests/actions/workflows/code-quality.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/ibitato/MistralAITests?style=flat-square)](https://codecov.io/gh/ibitato/MistralAITests)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg?style=flat-square)](https://www.python.org/)
+[![Mistral AI](https://img.shields.io/badge/Powered%20by-Mistral%20AI-000000.svg?style=flat-square)](https://mistral.ai/)
+[![GitHub Stars](https://img.shields.io/github/stars/ibitato/MistralAITests?style=flat-square&logo=github)](https://github.com/ibitato/MistralAITests/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/ibitato/MistralAITests?style=flat-square&logo=github)](https://github.com/ibitato/MistralAITests/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/ibitato/MistralAITests?style=flat-square&logo=github)](https://github.com/ibitato/MistralAITests/issues)
+[![GitHub Pull Requests](https://img.shields.io/github/issues-pr/ibitato/MistralAITests?style=flat-square&logo=github)](https://github.com/ibitato/MistralAITests/pulls)
+
 This project provides a scaffold for testing Mistral AI services. All development and examples have been created using **Mistral AI Vibe CLI 2.2.1** and the **Devstral 2** model.
 
 **Powered by:**

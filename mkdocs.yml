@@ -1,0 +1,50 @@
+site_name: MistralAITests
+site_description: Comprehensive testing framework for Mistral AI services
+site_author: David R. Lopez B.
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Features: features.md
+  - API Reference: api-reference.md
+  - Contributing: contributing.md
+  - Code of Conduct: code-of-conduct.md
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - pymdownx.emoji
+  - pymdownx.magiclink
+  - pymdownx.tasklist
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+
+repo_name: ibitato/MistralAITests
+repo_url: https://github.com/ibitato/MistralAITests
+
+copyright: Copyright &copy; 2024 David R. Lopez B.
