@@ -15,14 +15,14 @@ from typing import Any, Literal
 from dotenv import load_dotenv
 from mistralai import Mistral
 from mistralai.models import (
-    Function,
-    Tool,
     AssistantMessage,
-    SystemMessage,
-    UserMessage,
-    ToolMessage,
-    ImageURLChunk,
+    Function,
     ImageURL,
+    ImageURLChunk,
+    SystemMessage,
+    Tool,
+    ToolMessage,
+    UserMessage,
 )
 
 from src.determinism_controller import DeterminismController
