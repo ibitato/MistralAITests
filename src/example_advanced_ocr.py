@@ -119,15 +119,15 @@ def extract_text_from_pdf_simple(pdf_path: str) -> str:
         simulated_text = f"""
         DOCUMENT: {file_name}
         ====================
-        
+
         This is a simulated text extraction from the PDF document.
         In a real implementation, this would contain the actual
         extracted text content from all pages.
-        
+
         File Size: {len(content)} bytes
         Pages: [Simulated - would be actual page count]
         Content Type: {file_name.split('.')[-1].upper()}
-        
+
         Sample extracted content:
         - Document title and metadata
         - Main content sections
@@ -162,19 +162,19 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
             "text_content": f"""
             COMPLEX OCR EXTRACTION: {file_name}
             ==================================
-            
+
             [PAGE 1]
             Title: {file_name.replace('.pdf', '').replace('_', ' ').title()}
             Date: [Simulated extraction date]
-            
+
             Section 1: Introduction
             -----------------------
             This document contains comprehensive analysis of...
-            
+
             Section 2: Methodology
             --------------------
             The research methodology includes...
-            
+
             [TABLE 1 - Simulated]
             +----------------+---------------+
             | Metric         | Value         |
@@ -183,14 +183,14 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
             | Response Rate  | 85%           |
             | Accuracy       | 92.3%         |
             +----------------+---------------+
-            
+
             Section 3: Results
             -------------------
             Key findings include...
-            
+
             [FIGURE 1 - Simulated]
             [Chart showing trends over time]
-            
+
             Section 4: Conclusion
             ---------------------
             In summary, the analysis demonstrates...

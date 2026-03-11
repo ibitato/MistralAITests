@@ -16,10 +16,13 @@ import time
 from pathlib import Path
 
 import requests
+from colorama import Fore, Style, init
 from dotenv import load_dotenv
 from mistralai import Mistral
 
 from document_manager import DocumentManager
+
+init(autoreset=True)
 
 # Configure logging
 logging.basicConfig(
@@ -175,7 +178,7 @@ def create_batch_file(output_path: str, num_requests: int = 50) -> None:
 
     except OSError as e:
         logger.error(f"Failed to write batch file: {str(e)}")
-        raise OSError(f"Could not write to {output_path}: {str(e)}")
+        raise OSError(f"Could not write to {output_path}: {str(e)}") from e
 
 
 def submit_batch_job(client: Mistral, file_path: str, api_key: str) -> dict:
@@ -344,12 +347,6 @@ def print_warning(message: str):
 def print_success(message: str):
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
-
-
-# Import colorama at module level
-from colorama import Fore, Style, init
-
-init(autoreset=True)
 
 
 def main() -> None:
