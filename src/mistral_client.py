@@ -1010,3 +1010,6 @@ class MistralAIClient:
             raise RuntimeError(
                 f"Failed to process multimodal vision request: {str(e)}"
             ) from e
+
+
+# Regenerated with Black 26.3.0
