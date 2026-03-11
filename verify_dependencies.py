@@ -4,19 +4,20 @@ Script to verify all Python dependencies are installed.
 """
 
 import sys
+from importlib import metadata
 from pathlib import Path
 
 
 def check_package(package_name: str) -> bool:
     """Check if a package is installed."""
     try:
-        __import__(package_name)
+        metadata.version(package_name)
         return True
-    except ImportError:
+    except metadata.PackageNotFoundError:
         return False
 
 
-def main():
+def main() -> int:
     """Main function to verify dependencies."""
     print("🔍 Verifying Python Dependencies")
     print("=" * 60)

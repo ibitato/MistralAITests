@@ -6,10 +6,14 @@ Shows how to upload documents, ask questions, and manage files.
 
 import logging
 import os
+import sys
 import time
 
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
+
+# Add the project root to the Python path to access src modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from src.document_manager import DocumentManager
 from src.mistral_client import MistralAIClient
@@ -26,7 +30,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger("mistralai").setLevel(logging.WARNING)
 
 
-def print_header():
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 60)
     print("📄 MISTRAL AI DOCUMENT Q&A EXAMPLE")
@@ -35,24 +39,24 @@ def print_header():
     print("=" * 60 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
 
-def validate_api_key(api_key: str) -> bool:
+def validate_api_key(api_key: str | None) -> bool:
     """Validate API key format."""
     if not api_key:
         return False
@@ -91,14 +95,17 @@ def main() -> None:
         logger.error("Invalid API key")
         return
 
+    assert api_key is not None
+    api_key_str = api_key
+
     print_success("API key validated")
     logger.info("API key validated successfully")
 
     # Step 2: Initialize clients
     print("\n2️⃣  Initializing clients...")
     try:
-        doc_manager = DocumentManager(api_key)
-        mistral_client = MistralAIClient(api_key)
+        doc_manager = DocumentManager(api_key_str)
+        mistral_client = MistralAIClient(api_key_str)
         print_success("Clients initialized")
         logger.info("Clients initialized successfully")
     except Exception as e:

@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger("mistralai").setLevel(logging.WARNING)
 
 
-def print_header():
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 60)
     print("🎛️  MISTRAL AI DETERMINISM CONTROL EXAMPLE")
@@ -41,19 +41,19 @@ def print_header():
     print("=" * 60 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 

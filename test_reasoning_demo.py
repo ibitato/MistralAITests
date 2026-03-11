@@ -4,15 +4,12 @@ Demo script to show reasoning functionality in Mistral AI client.
 """
 
 import inspect
-import sys
 
-sys.path.insert(0, "src")
-
-from determinism_controller import DeterminismController
-from mistral_client import MistralAIClient
+from src.determinism_controller import DeterminismController
+from src.mistral_client import MistralAIClient
 
 
-def test_reasoning_integration():
+def test_reasoning_integration() -> None:
     """Test reasoning functionality integration."""
 
     print("🧠 MISTRAL AI REASONING FUNCTIONALITY DEMO")
@@ -28,11 +25,11 @@ def test_reasoning_integration():
 
     # Check chat_completion method
     sig = inspect.signature(client.chat_completion)
-    params = list(sig.parameters.keys())
+    chat_params = list(sig.parameters.keys())
 
-    print(f"   chat_completion() parameters: {params}")
+    print(f"   chat_completion() parameters: {chat_params}")
 
-    if "reasoning" in params:
+    if "reasoning" in chat_params:
         reasoning_param = sig.parameters["reasoning"]
         print(f"   ✅ reasoning parameter found: {reasoning_param}")
         print(f"      Default value: {reasoning_param.default}")
@@ -81,11 +78,11 @@ def test_reasoning_integration():
 
     for level in range(1, 6):
         controller = DeterminismController(level)
-        params = controller.get_parameters()
+        controller_params = controller.get_parameters()
 
         print(
-            f"   Level {level}: temp={params['temperature']:.1f}, "
-            f"top_p={params['top_p']:.1f}"
+            f"   Level {level}: temp={controller_params['temperature']:.1f}, "
+            f"top_p={controller_params['top_p']:.1f}"
         )
 
     print("\n   ✅ All determinism levels work with reasoning")

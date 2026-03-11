@@ -12,7 +12,7 @@ import logging
 import os
 import sys
 import time
-from typing import Any
+from typing import Any, TypedDict
 
 # Add src to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -44,7 +44,17 @@ SAMPLE_PDFS = {
 }
 
 
-def print_header():
+class BatchResult(TypedDict):
+    """Batch processing result for a single document."""
+
+    name: str
+    file: str
+    size: int
+    status: str
+    text_length: int
+
+
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 70)
     print("📄 MISTRAL AI ADVANCED OCR EXAMPLE")
@@ -53,24 +63,24 @@ def print_header():
     print("=" * 70 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
 
-def print_ocr_result(title: str, result: str, max_lines: int = 20):
+def print_ocr_result(title: str, result: str, max_lines: int = 20) -> None:
     """Print OCR result with formatting."""
     print(f"\n📋 {title}:")
     print("-" * 60)
@@ -89,7 +99,7 @@ def print_ocr_result(title: str, result: str, max_lines: int = 20):
     print(f"   • Words: {len(result.split())}")
 
 
-def validate_api_key(api_key: str) -> bool:
+def validate_api_key(api_key: str | None) -> bool:
     """Validate API key format."""
     if not api_key:
         return False
@@ -275,6 +285,9 @@ def main() -> None:
         logger.error("Invalid API key")
         return
 
+    assert api_key is not None
+    api_key_str = api_key
+
     print_success("API key validated")
     logger.info("API key validated successfully")
 
@@ -282,8 +295,8 @@ def main() -> None:
     print("\n2️⃣  Initializing clients...")
 
     try:
-        _ = DocumentManager(api_key=api_key)
-        _ = MistralAIClient(api_key=api_key, model="mistral-large-latest")
+        _ = DocumentManager(api_key=api_key_str)
+        _ = MistralAIClient(api_key=api_key_str, model="mistral-large-latest")
 
         print_success("Clients initialized successfully")
         logger.info("Clients initialized")
@@ -383,7 +396,7 @@ def main() -> None:
             ("Annual Report", SAMPLE_PDFS["annual_report"]),
         ]
 
-        batch_results = []
+        batch_results: list[BatchResult] = []
 
         for doc_name, doc_path in documents_to_process:
             print(f"\n📄 Processing: {doc_name}")
@@ -410,8 +423,8 @@ def main() -> None:
         total_chars = sum(r["text_length"] for r in batch_results)
         total_size = sum(r["size"] for r in batch_results) / (1024 * 1024)
 
-        for result in batch_results:
-            print(f"   • {result['name']}: {result['text_length']} chars")
+        for batch_result in batch_results:
+            print(f"   • {batch_result['name']}: {batch_result['text_length']} chars")
 
         print(f"\n   Total Documents: {len(batch_results)}")
         print(f"   Total Characters: {total_chars}")
@@ -442,7 +455,7 @@ def main() -> None:
         text2 = extract_text_from_pdf_simple(doc2)
 
         # Simulate comparison analysis
-        comparison_result = {
+        comparison_result: dict[str, Any] = {
             "doc1_size": len(text1),
             "doc2_size": len(text2),
             "size_difference": abs(len(text1) - len(text2)),

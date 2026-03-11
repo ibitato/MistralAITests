@@ -60,7 +60,7 @@ COMPLEX_PDFS = {
 }
 
 
-def print_header():
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 70)
     print("📄 MISTRAL AI COMPLEX PDF PROCESSING EXAMPLE")
@@ -69,24 +69,24 @@ def print_header():
     print("=" * 70 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
 
-def print_pdf_info(pdf_path: str):
+def print_pdf_info(pdf_path: str) -> None:
     """Print PDF file information."""
     file_size = os.path.getsize(pdf_path)
     file_name = os.path.basename(pdf_path)
@@ -96,7 +96,7 @@ def print_pdf_info(pdf_path: str):
     print(f"📄 Pages: {max(1, file_size // 50000)} (estimated)")
 
 
-def validate_api_key(api_key: str) -> bool:
+def validate_api_key(api_key: str | None) -> bool:
     """Validate API key format."""
     if not api_key:
         return False
@@ -137,7 +137,7 @@ def extract_pdf_metadata(pdf_path: str) -> dict[str, Any]:
         return {"error": str(e), "success": False}
 
 
-def extract_pdf_tables(pdf_path: str) -> list[dict[str, Any]]:
+def extract_pdf_tables(pdf_path: str) -> dict[str, Any]:
     """
     Extract tables from PDF file.
     In production, this would use camelot, pdfplumber, etc.
@@ -369,6 +369,9 @@ def main() -> None:
         logger.error("Invalid API key")
         return
 
+    assert api_key is not None
+    api_key_str = api_key
+
     print_success("API key validated")
     logger.info("API key validated successfully")
 
@@ -376,8 +379,8 @@ def main() -> None:
     print("\n2️⃣  Initializing clients...")
 
     try:
-        _ = DocumentManager(api_key=api_key)
-        _ = MistralAIClient(api_key=api_key, model="mistral-large-latest")
+        _ = DocumentManager(api_key=api_key_str)
+        _ = MistralAIClient(api_key=api_key_str, model="mistral-large-latest")
 
         print_success("Clients initialized successfully")
         logger.info("Clients initialized")

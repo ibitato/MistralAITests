@@ -9,7 +9,7 @@ import json
 import logging
 import os
 import time
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Sequence
 from typing import Any, Literal
 
 from dotenv import load_dotenv
@@ -42,7 +42,7 @@ class MistralAIClient:
         api_key: str | None = None,
         model: str = "mistral-tiny",
         determinism_level: int = 3,
-    ):
+    ) -> None:
         """Initialize Mistral AI client.
 
         Args:
@@ -50,11 +50,80 @@ class MistralAIClient:
             model: Model to use for completions
             determinism_level: Determinism level (1-5), default is 3 (balanced)
         """
-        self.api_key = api_key or os.getenv("MISTRAL_AI_API_KEY")
+        resolved_api_key = api_key or os.getenv("MISTRAL_AI_API_KEY")
+        if not resolved_api_key:
+            raise ValueError("Mistral AI API key is required")
+
+        self.api_key = resolved_api_key
         self.model = model
         self.determinism_level = determinism_level
         self.client = Mistral(api_key=self.api_key)
         self.determinism_controller = DeterminismController(determinism_level)
+
+    def _get_message_role(self, message: Any) -> str | None:
+        """Extract a message role from dict or SDK message objects."""
+        if isinstance(message, dict):
+            role = message.get("role")
+            return role if isinstance(role, str) else None
+
+        role = getattr(message, "role", None)
+        return role if isinstance(role, str) else None
+
+    def _get_message_content(self, message: Any) -> Any:
+        """Extract message content from dict or SDK message objects."""
+        if isinstance(message, dict):
+            return message.get("content")
+
+        return getattr(message, "content", None)
+
+    def _with_message_content(self, message: Any, content: str) -> Any:
+        """Return a message with updated content while preserving message type."""
+        if isinstance(message, dict):
+            updated_message = message.copy()
+            updated_message["content"] = content
+            return updated_message
+
+        if hasattr(message, "model_copy"):
+            return message.model_copy(update={"content": content})
+
+        message.content = content
+        return message
+
+    def _apply_reasoning_prompt(
+        self, messages: list[Any], reasoning: bool
+    ) -> list[Any]:
+        """Add reasoning instructions without mutating the original message list."""
+        prepared_messages = list(messages)
+        if not reasoning:
+            return prepared_messages
+
+        reasoning_prompt = (
+            "You are a helpful AI assistant that thinks step by step. "
+            "Show your reasoning process before providing the final answer."
+        )
+        reasoning_suffix = " Show your reasoning process step by step before providing the final answer."
+
+        has_system = any(
+            self._get_message_role(message) == "system" for message in prepared_messages
+        )
+        if not has_system:
+            return [{"role": "system", "content": reasoning_prompt}, *prepared_messages]
+
+        for index, message in enumerate(prepared_messages):
+            if self._get_message_role(message) != "system":
+                continue
+
+            current_content = self._get_message_content(message)
+            if not isinstance(current_content, str):
+                current_content = str(current_content)
+
+            prepared_messages[index] = self._with_message_content(
+                message,
+                current_content + reasoning_suffix,
+            )
+            break
+
+        return prepared_messages
 
     def chat_completion(
         self,
@@ -102,30 +171,11 @@ class MistralAIClient:
             if temperature == 0.0:
                 params["top_p"] = 1.0
 
-        # Add reasoning prompt if enabled
-        if reasoning:
-            # Add reasoning instruction to system message or create one
-            has_system = any(msg.get("role") == "system" for msg in messages)
-            if not has_system:
-                messages.insert(
-                    0,
-                    {
-                        "role": "system",
-                        "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer.",
-                    },
-                )
-            else:
-                # Modify existing system message to include reasoning
-                for msg in messages:
-                    if msg.get("role") == "system":
-                        msg[
-                            "content"
-                        ] += " Show your reasoning process step by step before providing the final answer."
-                        break
+        prepared_messages = self._apply_reasoning_prompt(messages, reasoning)
 
         try:
             chat_response = self.client.chat.complete(
-                model=self.model, messages=messages, **params
+                model=self.model, messages=prepared_messages, **params
             )
 
             if not chat_response.choices or len(chat_response.choices) == 0:
@@ -289,30 +339,11 @@ class MistralAIClient:
             if temperature == 0.0:
                 params["top_p"] = 1.0
 
-        # Add reasoning prompt if enabled
-        if reasoning:
-            # Add reasoning instruction to system message or create one
-            has_system = any(msg.get("role") == "system" for msg in messages)
-            if not has_system:
-                messages.insert(
-                    0,
-                    {
-                        "role": "system",
-                        "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer.",
-                    },
-                )
-            else:
-                # Modify existing system message to include reasoning
-                for msg in messages:
-                    if msg.get("role") == "system":
-                        msg[
-                            "content"
-                        ] += " Show your reasoning process step by step before providing the final answer."
-                        break
+        prepared_messages = self._apply_reasoning_prompt(messages, reasoning)
 
         try:
             chat_response = self.client.chat.complete(
-                model=self.model, messages=messages, **params
+                model=self.model, messages=prepared_messages, **params
             )
 
             duration = time.time() - start_time
@@ -384,10 +415,10 @@ class MistralAIClient:
     def chat_completion_with_tools(
         self,
         messages: list[Any],
-        tools: list[Function],
+        tools: Sequence[Tool | Function],
         temperature: float | None = None,
         determinism_level: int | None = None,
-        tool_choice: str = "auto",
+        tool_choice: str | dict[str, Any] = "auto",
     ) -> dict[str, Any]:
         """Get chat completion with tool calling capabilities.
 
@@ -526,7 +557,7 @@ class MistralAIClient:
     def execute_tool_calls(
         self,
         tool_calls: list[dict[str, Any]],
-        available_functions: dict[str, Callable],
+        available_functions: dict[str, Callable[..., Any]],
     ) -> list[dict[str, Any]]:
         """Execute tool calls using available functions.
 
@@ -594,8 +625,8 @@ class MistralAIClient:
     def chat_completion_with_tool_execution(
         self,
         messages: list[Any],
-        tools: list[Function],
-        available_functions: dict[str, Callable],
+        tools: Sequence[Tool | Function],
+        available_functions: dict[str, Callable[..., Any]],
         temperature: float | None = None,
         determinism_level: int | None = None,
         max_iterations: int = 3,
@@ -641,6 +672,7 @@ class MistralAIClient:
         all_messages = messages.copy()
         iteration = 0
         tool_execution_history = []
+        latest_response: dict[str, Any] | None = None
 
         while iteration < max_iterations:
             iteration += 1
@@ -653,6 +685,7 @@ class MistralAIClient:
                 determinism_level=determinism_level,
                 tool_choice="auto",
             )
+            latest_response = response
 
             # Add assistant response to message history
             assistant_message = {
@@ -692,6 +725,16 @@ class MistralAIClient:
                         "success": "error" not in json.loads(tool_response["content"]),
                     }
                 )
+
+        if latest_response is not None and not latest_response["tool_calls"]:
+            return {
+                "final_response": latest_response["content"],
+                "all_messages": all_messages,
+                "tool_execution_history": tool_execution_history,
+                "iterations": iteration,
+                "tokens_used": latest_response["tokens"]["total"],
+                "duration": latest_response["duration"],
+            }
 
         # Get final response (without tools)
         final_response = self.chat_completion_with_tools(

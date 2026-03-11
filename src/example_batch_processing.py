@@ -14,13 +14,17 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Any, cast
 
 import requests
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
 from mistralai import Mistral
 
-from document_manager import DocumentManager
+# Add the project root to the Python path to access src modules
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+from src.document_manager import DocumentManager
 
 init(autoreset=True)
 
@@ -36,7 +40,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger("mistralai").setLevel(logging.WARNING)
 
 
-def cleanup_previous_batch_files():
+def cleanup_previous_batch_files() -> None:
     """Clean up any previous batch files to prevent accumulation."""
     test_data_dir = Path("tests/test_data")
     if test_data_dir.exists():
@@ -181,7 +185,7 @@ def create_batch_file(output_path: str, num_requests: int = 50) -> None:
         raise OSError(f"Could not write to {output_path}: {str(e)}") from e
 
 
-def submit_batch_job(client: Mistral, file_path: str, api_key: str) -> dict:
+def submit_batch_job(client: Mistral, file_path: str, api_key: str) -> dict[str, Any]:
     """Submit a batch job to Mistral AI."""
     try:
         # Read the batch file content
@@ -204,7 +208,7 @@ def submit_batch_job(client: Mistral, file_path: str, api_key: str) -> dict:
         )
 
         response.raise_for_status()
-        return response.json()
+        return cast(dict[str, Any], response.json())
 
     except Exception as e:
         raise RuntimeError(f"Failed to submit batch job: {str(e)}") from e
@@ -245,18 +249,33 @@ def monitor_job_status(api_key: str, file_id: str, timeout: int = 600) -> str:
     return "timeout"
 
 
-def retrieve_results(api_key: str, client: Mistral, file_id: str) -> list:
+def get_status_timeout_seconds() -> int:
+    """Get a bounded timeout for remote batch file polling."""
+    raw_timeout = os.getenv("MISTRAL_BATCH_STATUS_TIMEOUT_SECONDS", "20")
+    try:
+        timeout_seconds = int(raw_timeout)
+    except ValueError:
+        return 20
+
+    return max(5, min(timeout_seconds, 60))
+
+
+def retrieve_results(
+    api_key: str, client: Mistral, file_id: str
+) -> list[dict[str, Any]]:
     """Retrieve batch processing results."""
     try:
+        _ = api_key
+        _ = file_id
         # For batch processing, we would typically use the file for chat completions
         # This is a simplified version since the full batch API might not be available
 
         # Read the original batch file to get the request structure
-        with open("batch_requests_50.jsonl") as f:
+        with open("tests/test_data/batch_requests_50.jsonl") as f:
             original_requests = [json.loads(line) for line in f]
 
         # Process each request individually (simulating batch processing)
-        results = []
+        results: list[dict[str, Any]] = []
         for request in original_requests[:3]:  # Process first 3 as demo
             chat_response = client.chat.complete(
                 model="mistral-tiny", **request["body"]
@@ -276,7 +295,7 @@ def retrieve_results(api_key: str, client: Mistral, file_id: str) -> list:
         raise RuntimeError(f"Failed to retrieve results: {str(e)}") from e
 
 
-def display_results_summary(results: list) -> None:
+def display_results_summary(results: list[dict[str, Any]]) -> None:
     """Display a summary of batch processing results."""
     if not results:
         print("    No results available")
@@ -286,13 +305,14 @@ def display_results_summary(results: list) -> None:
     print("-" * 80)
 
     for i, result in enumerate(results, 1):
-        print(f"\n📋 Response {i} (ID: {result.custom_id}):")
-        print(f"   Status: {result.status}")
+        print(f"\n📋 Response {i} (ID: {result['custom_id']}):")
+        print(f"   Status: {result['status']}")
 
-        if hasattr(result, "response") and result.response:
+        response = result.get("response")
+        if response:
             content = (
-                result.response.choices[0].message.content
-                if result.response.choices
+                response.choices[0].message.content
+                if response.choices
                 else "No content"
             )
             # Show first 100 characters of response
@@ -305,7 +325,7 @@ def display_results_summary(results: list) -> None:
             print(f"   ... showing {i} of {len(results)} results ...")
 
 
-def validate_api_key(api_key: str) -> bool:
+def validate_api_key(api_key: str | None) -> bool:
     """Validate API key format.
 
     Args:
@@ -323,7 +343,7 @@ def validate_api_key(api_key: str) -> bool:
     return True
 
 
-def print_header():
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 60)
     print("🚀 MISTRAL AI BATCH PROCESSING EXAMPLE")
@@ -332,19 +352,19 @@ def print_header():
     print("=" * 60 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
@@ -366,6 +386,9 @@ def main() -> None:
         logger.error("Invalid API key")
         return
 
+    assert api_key is not None
+    api_key_str = api_key
+
     logger.info("Starting batch processing example")
     logger.info("Mistral AI Vibe CLI 2.2.1")
     logger.info(f"Python {sys.version.split()[0]}")
@@ -375,7 +398,7 @@ def main() -> None:
     # Initialize client
     print("\n🔧 Initializing Mistral AI client...")
     try:
-        client = Mistral(api_key=api_key)
+        client = Mistral(api_key=api_key_str)
         print("✅ Client initialized successfully")
     except Exception as e:
         print(f"❌ Failed to initialize client: {str(e)}")
@@ -449,9 +472,9 @@ def main() -> None:
 
     # Submit batch job
     print("\n📤 Submitting batch job to Mistral AI...")
-    uploaded_file_id = None
+    uploaded_file_id: str | None = None
     try:
-        job_response = submit_batch_job(client, batch_file, api_key)
+        job_response = submit_batch_job(client, batch_file, api_key_str)
         uploaded_file_id = job_response.get("id", "unknown")
         print("✅ Batch file uploaded successfully")
         print(f"   File ID: {uploaded_file_id}")
@@ -466,14 +489,23 @@ def main() -> None:
     print("   This may take several minutes for 50 requests...")
     print("   Status: ", end="", flush=True)
 
-    status = monitor_job_status(api_key, uploaded_file_id)
+    if uploaded_file_id is None:
+        print_error("Batch upload failed", "No file ID was returned by the API")
+        return
+
+    status_timeout = get_status_timeout_seconds()
+    status = monitor_job_status(
+        api_key_str,
+        uploaded_file_id,
+        timeout=status_timeout,
+    )
     print(f"\n📊 Final processing status: {status}")
 
     if status == "completed":
         # Retrieve results
         print("\n📥 Processing batch requests...")
         try:
-            results = retrieve_results(api_key, client, uploaded_file_id)
+            results = retrieve_results(api_key_str, client, uploaded_file_id)
             print(f"✅ Processed {len(results)} demo results")
 
             # Display summary
@@ -484,10 +516,17 @@ def main() -> None:
 
     elif status == "failed":
         print("❌ Batch processing failed. Check your API key and request format.")
-    elif status == "timeout":
-        print("⏰ Batch processing did not complete within the timeout period.")
     else:
-        print(f"⚠️  Batch processing ended with status: {status}")
+        print_warning(
+            "Remote batch file did not reach 'processed' status in time; "
+            "continuing with local demo processing."
+        )
+        try:
+            results = retrieve_results(api_key_str, client, uploaded_file_id)
+            print(f"✅ Processed {len(results)} demo results")
+            display_results_summary(results)
+        except Exception as e:
+            print(f"❌ Failed to process demo results: {str(e)}")
 
     # Step 5: Cleanup
     print("\n5️⃣  Cleaning up...")
@@ -499,7 +538,7 @@ def main() -> None:
     remote_cleanup_success = False
     if uploaded_file_id and uploaded_file_id != "unknown":
         try:
-            doc_manager = DocumentManager(api_key)
+            doc_manager = DocumentManager(api_key_str)
             remote_cleanup_success = doc_manager.delete_document(uploaded_file_id)
             if remote_cleanup_success:
                 print(f"   ✅ Remote file {uploaded_file_id} deleted from Mistral AI")

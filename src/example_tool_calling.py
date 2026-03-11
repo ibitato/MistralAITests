@@ -10,6 +10,8 @@ import os
 import sys
 import textwrap
 import time
+from collections.abc import Callable
+from typing import Any, cast
 
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
@@ -35,7 +37,7 @@ logging.getLogger("mistralai").setLevel(logging.WARNING)
 
 
 # Sample tool functions
-def get_weather(location: str, unit: str = "celsius") -> dict:
+def get_weather(location: str, unit: str = "celsius") -> dict[str, Any]:
     """Get current weather for a location (mock implementation).
 
     Args:
@@ -65,11 +67,12 @@ def get_weather(location: str, unit: str = "celsius") -> dict:
         }
 
     weather = weather_data[location]
+    base_temperature = cast(int, weather["temperature"])
 
     if unit == "fahrenheit":
-        temperature = round(weather["temperature"] * 9 / 5 + 32, 1)
+        temperature: int | float = round(base_temperature * 9 / 5 + 32, 1)
     else:
-        temperature = weather["temperature"]
+        temperature = base_temperature
 
     return {
         "location": location,
@@ -81,7 +84,7 @@ def get_weather(location: str, unit: str = "celsius") -> dict:
     }
 
 
-def calculate_expression(expression: str) -> dict:
+def calculate_expression(expression: str) -> dict[str, Any]:
     """Evaluate a mathematical expression safely.
 
     Args:
@@ -105,7 +108,7 @@ def calculate_expression(expression: str) -> dict:
         return {"error": f"Failed to evaluate expression: {str(e)}", "success": False}
 
 
-def web_search(query: str, max_results: int = 3) -> dict:
+def web_search(query: str, max_results: int = 3) -> dict[str, Any]:
     """Search the web for information (mock implementation).
 
     Args:
@@ -155,7 +158,7 @@ def web_search(query: str, max_results: int = 3) -> dict:
     return {"query": query, "results": results[:max_results], "success": True}
 
 
-def get_stock_price(symbol: str) -> dict:
+def get_stock_price(symbol: str) -> dict[str, Any]:
     """Get current stock price (mock implementation).
 
     Args:
@@ -190,7 +193,7 @@ def get_stock_price(symbol: str) -> dict:
     }
 
 
-def print_header():
+def print_header() -> None:
     """Print standardized example header."""
     print("\n" + "=" * 60)
     print("🔧 MISTRAL AI TOOL CALLING EXAMPLE")
@@ -199,24 +202,24 @@ def print_header():
     print("=" * 60 + "\n")
 
 
-def print_error(message: str, details: str = ""):
+def print_error(message: str, details: str = "") -> None:
     """Print standardized error message."""
     print(f"\n{Fore.RED}❌ Error: {message}{Style.RESET_ALL}")
     if details:
         print(f"   {details}")
 
 
-def print_warning(message: str):
+def print_warning(message: str) -> None:
     """Print standardized warning message."""
     print(f"\n{Fore.YELLOW}⚠️  Warning: {message}{Style.RESET_ALL}")
 
 
-def print_success(message: str):
+def print_success(message: str) -> None:
     """Print standardized success message."""
     print(f"{Fore.GREEN}✅ {message}{Style.RESET_ALL}")
 
 
-def print_tool_call(tool_call: dict, indent: str = "   "):
+def print_tool_call(tool_call: dict[str, Any], indent: str = "   ") -> None:
     """Print tool call information."""
     function_name = tool_call["function"]["name"]
     arguments = json.loads(tool_call["function"]["arguments"])
@@ -225,7 +228,7 @@ def print_tool_call(tool_call: dict, indent: str = "   "):
     print(f"{indent}   Arguments: {json.dumps(arguments, indent=6)}")
 
 
-def print_tool_response(tool_response: dict, indent: str = "   "):
+def print_tool_response(tool_response: dict[str, Any], indent: str = "   ") -> None:
     """Print tool response information."""
     content = json.loads(tool_response["content"])
 
@@ -375,7 +378,7 @@ def main() -> None:
     logger.info(f"Defined {len(tools)} tools for tool calling")
 
     # Step 3: Map functions to available functions dictionary
-    available_functions = {
+    available_functions: dict[str, Callable[..., Any]] = {
         "get_weather": get_weather,
         "calculate_expression": calculate_expression,
         "web_search": web_search,
