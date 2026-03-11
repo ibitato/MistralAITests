@@ -40,8 +40,8 @@ This project provides a scaffold for testing Mistral AI services. All developmen
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/MistalAITests.git
-   cd MistalAITests
+   git clone https://github.com/ibitato/MistralAITests.git
+   cd MistralAITests
    ```
 
 2. Create and activate virtual environment:
@@ -255,7 +255,7 @@ Mistral AI provides state-of-the-art language models and tools for building inte
 
 **David R. Lopez B.**
 - Email: ibitato@gmail.com
-- GitHub: [davidlopezb](https://github.com/davidlopezb)
+- GitHub: [ibitato](https://github.com/ibitato)
 - Role: Lead Developer & Architect
 
 ## License

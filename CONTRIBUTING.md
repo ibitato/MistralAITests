@@ -47,7 +47,7 @@ We welcome pull requests! Here's how to submit one:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/MistralAITests.git
+   git clone https://github.com/ibitato/MistralAITests.git
    cd MistralAITests
    ```
 
