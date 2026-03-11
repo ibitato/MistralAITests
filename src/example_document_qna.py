@@ -4,10 +4,9 @@ Example script demonstrating Document QnA with Mistral AI.
 Shows how to upload documents, ask questions, and manage files.
 """
 
+import logging
 import os
 import time
-import logging
-from typing import Optional
 
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
@@ -18,11 +17,8 @@ from src.mistral_client import MistralAIClient
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('document_qna.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("document_qna.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
@@ -70,30 +66,31 @@ def validate_api_key(api_key: str) -> bool:
 # Import colorama at module level
 init(autoreset=True)
 
+
 def main() -> None:
     """Main function demonstrating Document QnA workflow."""
     start_time = time.time()
-    
+
     logger.info("Starting document QnA example")
-    logger.info(f"Mistral AI Vibe CLI 2.2.1")
+    logger.info("Mistral AI Vibe CLI 2.2.1")
     logger.info(f"Python {time.strftime('%Y-%m-%d %H:%M:%S')}")
-    
+
     print_header()
 
     # Step 1: Load and validate API key
     print("1️⃣  Loading configuration...")
-    
+
     load_dotenv()
     api_key = os.getenv("MISTRAL_AI_API_KEY")
 
     if not validate_api_key(api_key):
         print_error(
             "MISTRAL_AI_API_KEY not found or invalid",
-            "Please set a valid API key in .env file"
+            "Please set a valid API key in .env file",
         )
         logger.error("Invalid API key")
         return
-    
+
     print_success("API key validated")
     logger.info("API key validated successfully")
 
@@ -115,16 +112,16 @@ def main() -> None:
         file_info = doc_manager.upload_document(
             "test_docs/edc-2024-annual-report.pdf", purpose="ocr"
         )
-        file_size = getattr(file_info, 'bytes', 'N/A')
-        created_at = getattr(file_info, 'created_at', 'N/A')
-        
+        file_size = getattr(file_info, "bytes", "N/A")
+        created_at = getattr(file_info, "created_at", "N/A")
+
         print_success(f"Document uploaded: {file_info.filename}")
         print(f"   📁 File ID: {file_info.id}")
         print(f"   📊 Size: {file_size} bytes")
         print(f"   📅 Created: {created_at}")
-        
+
         logger.info(f"Document uploaded: {file_info.filename} (ID: {file_info.id})")
-        
+
     except FileNotFoundError as e:
         print_error("Document file not found", str(e))
         logger.error(f"Document file not found: {str(e)}")
@@ -192,28 +189,28 @@ def main() -> None:
 
     # Summary
     elapsed_time = time.time() - start_time
-    
+
     print("\n" + "=" * 60)
     print("✅ DOCUMENT Q&A EXAMPLE COMPLETED")
     print("=" * 60)
-    
+
     print("\n📊 Results:")
     print("   • Document uploaded and processed")
     print("   • Questions answered: 4")
     print("   • Cleanup completed")
     print(f"   • Execution time: {elapsed_time:.2f} seconds")
-    
+
     print("\n📚 Resources:")
     print("   • Documentation: docs/API_INTEGRATION.md")
     print("   • All Examples: python main_examples.py")
     print("   • Mistral AI: https://mistral.ai")
-    
+
     print("\n💡 Tips:")
     print("   • Use OCR purpose for text extraction")
     print("   • Always clean up uploaded documents")
     print("   • Handle file IDs carefully")
     print("   • Validate responses before use")
-    
+
     logger.info(f"Document QnA example completed in {elapsed_time:.2f} seconds")
     logger.info("Document processing and cleanup successful")
 

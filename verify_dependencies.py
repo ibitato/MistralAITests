@@ -4,7 +4,6 @@ Script to verify all Python dependencies are installed.
 """
 
 import sys
-import subprocess
 from pathlib import Path
 
 
@@ -21,31 +20,31 @@ def main():
     """Main function to verify dependencies."""
     print("🔍 Verifying Python Dependencies")
     print("=" * 60)
-    
+
     # Read requirements files
     requirements = []
     dev_requirements = []
-    
+
     # Read main requirements
     req_file = Path("requirements.txt")
     if req_file.exists():
-        with open(req_file, 'r') as f:
+        with open(req_file) as f:
             for line in f:
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    package = line.split('>=')[0].split('==')[0].strip()
+                if line and not line.startswith("#"):
+                    package = line.split(">=")[0].split("==")[0].strip()
                     requirements.append(package)
-    
+
     # Read dev requirements
     dev_req_file = Path("requirements-dev.txt")
     if dev_req_file.exists():
-        with open(dev_req_file, 'r') as f:
+        with open(dev_req_file) as f:
             for line in f:
                 line = line.strip()
-                if line and not line.startswith('#'):
-                    package = line.split('>=')[0].split('==')[0].strip()
+                if line and not line.startswith("#"):
+                    package = line.split(">=")[0].split("==")[0].strip()
                     dev_requirements.append(package)
-    
+
     # Check main requirements
     print("\n📋 Main Requirements:")
     print("-" * 60)
@@ -56,7 +55,7 @@ def main():
         else:
             print(f"❌ {package}")
             main_missing.append(package)
-    
+
     # Check dev requirements
     print("\n📋 Development Requirements:")
     print("-" * 60)
@@ -67,12 +66,12 @@ def main():
         else:
             print(f"❌ {package}")
             dev_missing.append(package)
-    
+
     # Summary
     print("\n" + "=" * 60)
     print("📊 SUMMARY")
     print("=" * 60)
-    
+
     if not main_missing and not dev_missing:
         print("✅ All dependencies installed successfully!")
         print(f"   • Main requirements: {len(requirements)} packages")
@@ -84,7 +83,7 @@ def main():
             print(f"   • Main: {', '.join(main_missing)}")
         if dev_missing:
             print(f"   • Dev: {', '.join(dev_missing)}")
-        
+
         print("\n💡 To install missing dependencies:")
         print("   pip install -r requirements.txt")
         print("   pip install -r requirements-dev.txt")

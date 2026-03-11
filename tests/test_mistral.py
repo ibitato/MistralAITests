@@ -3,14 +3,13 @@ Test cases for Mistral AI client.
 """
 
 import json
-from unittest.mock import MagicMock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
+from mistralai.models import Function, Tool
 
 from src.determinism_controller import DeterminismController
 from src.mistral_client import MistralAIClient
-from mistralai.models import Function, Tool, ToolCall
-
 from src.utils import format_chat_message, truncate_text, validate_api_key
 
 
@@ -370,12 +369,12 @@ class TestToolCalling:
                         "properties": {
                             "location": {
                                 "type": "string",
-                                "description": "City and country"
+                                "description": "City and country",
                             }
                         },
-                        "required": ["location"]
-                    }
-                )
+                        "required": ["location"],
+                    },
+                ),
             ),
             Tool(
                 type="function",
@@ -387,28 +386,26 @@ class TestToolCalling:
                         "properties": {
                             "expression": {
                                 "type": "string",
-                                "description": "Math expression"
+                                "description": "Math expression",
                             }
                         },
-                        "required": ["expression"]
-                    }
-                )
-            )
+                        "required": ["expression"],
+                    },
+                ),
+            ),
         ]
 
     @pytest.fixture
     def sample_functions(self):
         """Create sample functions for testing."""
+
         def get_weather(location: str) -> dict:
             return {"location": location, "temperature": 22, "unit": "celsius"}
 
         def calculate(expression: str) -> dict:
             return {"expression": expression, "result": eval(expression)}
 
-        return {
-            "get_weather": get_weather,
-            "calculate": calculate
-        }
+        return {"get_weather": get_weather, "calculate": calculate}
 
     def test_chat_completion_with_tools_basic(self, mock_client, sample_tools):
         """Test basic tool calling functionality."""
@@ -419,7 +416,7 @@ class TestToolCalling:
         mock_response = MagicMock()
         mock_message = MagicMock()
         mock_message.content = None  # No content when tool calls are made
-        
+
         # Mock tool call
         mock_tool_call = MagicMock()
         mock_tool_call.id = "call_123"
@@ -428,27 +425,25 @@ class TestToolCalling:
         mock_function.name = "get_weather"
         mock_function.arguments = '{"location": "Paris, France"}'
         mock_tool_call.function = mock_function
-        
+
         mock_message.tool_calls = [mock_tool_call]
         mock_choice = MagicMock()
         mock_choice.message = mock_message
         mock_response.choices = [mock_choice]
-        
+
         # Mock usage
         mock_usage = MagicMock()
         mock_usage.prompt_tokens = 15
         mock_usage.completion_tokens = 25
         mock_response.usage = mock_usage
-        
+
         mock_instance.chat.complete.return_value = mock_response
 
         client = MistralAIClient(api_key="test_key")
         messages = [{"role": "user", "content": "What's the weather in Paris?"}]
 
         result = client.chat_completion_with_tools(
-            messages=messages,
-            tools=sample_tools,
-            temperature=0.3
+            messages=messages, tools=sample_tools, temperature=0.3
         )
 
         # Verify result structure
@@ -487,9 +482,7 @@ class TestToolCalling:
 
         # Test empty tools
         with pytest.raises(ValueError, match="Tools list cannot be empty"):
-            client.chat_completion_with_tools(
-                [{"role": "user", "content": "Test"}], []
-            )
+            client.chat_completion_with_tools([{"role": "user", "content": "Test"}], [])
 
     def test_chat_completion_with_tools_no_tool_calls(self, mock_client, sample_tools):
         """Test tool calling when no tools are called."""
@@ -504,13 +497,13 @@ class TestToolCalling:
         mock_choice = MagicMock()
         mock_choice.message = mock_message
         mock_response.choices = [mock_choice]
-        
+
         # Mock usage
         mock_usage = MagicMock()
         mock_usage.prompt_tokens = 10
         mock_usage.completion_tokens = 20
         mock_response.usage = mock_usage
-        
+
         mock_instance.chat.complete.return_value = mock_response
 
         client = MistralAIClient(api_key="test_key")
@@ -519,7 +512,7 @@ class TestToolCalling:
         result = client.chat_completion_with_tools(
             messages=messages,
             tools=sample_tools,
-            tool_choice="none"  # Force no tool calls
+            tool_choice="none",  # Force no tool calls
         )
 
         # Verify content is present
@@ -538,13 +531,12 @@ class TestToolCalling:
             "type": "function",
             "function": {
                 "name": "get_weather",
-                "arguments": '{"location": "Paris, France"}'
-            }
+                "arguments": '{"location": "Paris, France"}',
+            },
         }
 
         result = client.execute_tool_calls(
-            tool_calls=[tool_call],
-            available_functions=sample_functions
+            tool_calls=[tool_call], available_functions=sample_functions
         )
 
         # Verify tool response
@@ -568,13 +560,12 @@ class TestToolCalling:
             "type": "function",
             "function": {
                 "name": "non_existent_function",
-                "arguments": '{"param": "value"}'
-            }
+                "arguments": '{"param": "value"}',
+            },
         }
 
         result = client.execute_tool_calls(
-            tool_calls=[tool_call],
-            available_functions=sample_functions
+            tool_calls=[tool_call], available_functions=sample_functions
         )
 
         # Verify error response
@@ -596,10 +587,11 @@ class TestToolCalling:
             client.execute_tool_calls([], sample_functions)
 
         # Test empty functions
-        with pytest.raises(ValueError, match="Available functions dictionary cannot be empty"):
+        with pytest.raises(
+            ValueError, match="Available functions dictionary cannot be empty"
+        ):
             client.execute_tool_calls(
-                [{"id": "test", "function": {"name": "test", "arguments": "{}"}}],
-                {}
+                [{"id": "test", "function": {"name": "test", "arguments": "{}"}}], {}
             )
 
     def test_chat_completion_with_tool_execution_full_workflow(
@@ -613,7 +605,7 @@ class TestToolCalling:
         mock_response1 = MagicMock()
         mock_message1 = MagicMock()
         mock_message1.content = None
-        
+
         mock_tool_call = MagicMock()
         mock_tool_call.id = "call_123"
         mock_tool_call.type = "function"
@@ -621,12 +613,12 @@ class TestToolCalling:
         mock_function.name = "calculate"
         mock_function.arguments = '{"expression": "15 * 3"}'
         mock_tool_call.function = mock_function
-        
+
         mock_message1.tool_calls = [mock_tool_call]
         mock_choice1 = MagicMock()
         mock_choice1.message = mock_message1
         mock_response1.choices = [mock_choice1]
-        
+
         mock_usage1 = MagicMock()
         mock_usage1.prompt_tokens = 10
         mock_usage1.completion_tokens = 20
@@ -640,7 +632,7 @@ class TestToolCalling:
         mock_choice2 = MagicMock()
         mock_choice2.message = mock_message2
         mock_response2.choices = [mock_choice2]
-        
+
         mock_usage2 = MagicMock()
         mock_usage2.prompt_tokens = 15
         mock_usage2.completion_tokens = 10
@@ -649,7 +641,11 @@ class TestToolCalling:
         # Mock the sequence of calls - need 3 calls total
         # 1. First call with tool_choice="auto" -> returns tool call
         # 2. Second call with tool_choice="none" -> returns final answer
-        mock_instance.chat.complete.side_effect = [mock_response1, mock_response2, mock_response2]
+        mock_instance.chat.complete.side_effect = [
+            mock_response1,
+            mock_response2,
+            mock_response2,
+        ]
 
         client = MistralAIClient(api_key="test_key")
         messages = [{"role": "user", "content": "What's 15 * 3?"}]
@@ -658,7 +654,7 @@ class TestToolCalling:
             messages=messages,
             tools=sample_tools,
             available_functions=sample_functions,
-            max_iterations=2
+            max_iterations=2,
         )
 
         # Verify full workflow result
@@ -702,7 +698,9 @@ class TestToolCalling:
             )
 
         # Test empty functions
-        with pytest.raises(ValueError, match="Available functions dictionary cannot be empty"):
+        with pytest.raises(
+            ValueError, match="Available functions dictionary cannot be empty"
+        ):
             client.chat_completion_with_tool_execution(
                 [{"role": "user", "content": "Test"}], sample_tools, {}
             )
@@ -713,7 +711,7 @@ class TestToolCalling:
                 [{"role": "user", "content": "Test"}],
                 sample_tools,
                 sample_functions,
-                max_iterations=0
+                max_iterations=0,
             )
 
         with pytest.raises(ValueError, match="Max iterations cannot exceed 10"):
@@ -721,7 +719,7 @@ class TestToolCalling:
                 [{"role": "user", "content": "Test"}],
                 sample_tools,
                 sample_functions,
-                max_iterations=11
+                max_iterations=11,
             )
 
     def test_tool_choice_options(self, mock_client, sample_tools):
@@ -737,12 +735,12 @@ class TestToolCalling:
         mock_choice = MagicMock()
         mock_choice.message = mock_message
         mock_response.choices = [mock_choice]
-        
+
         mock_usage = MagicMock()
         mock_usage.prompt_tokens = 10
         mock_usage.completion_tokens = 20
         mock_response.usage = mock_usage
-        
+
         mock_instance.chat.complete.return_value = mock_response
 
         client = MistralAIClient(api_key="test_key")
@@ -750,17 +748,13 @@ class TestToolCalling:
 
         # Test auto tool choice
         result = client.chat_completion_with_tools(
-            messages=messages,
-            tools=sample_tools,
-            tool_choice="auto"
+            messages=messages, tools=sample_tools, tool_choice="auto"
         )
         assert result["content"] == "Response"
 
         # Test none tool choice
         result = client.chat_completion_with_tools(
-            messages=messages,
-            tools=sample_tools,
-            tool_choice="none"
+            messages=messages, tools=sample_tools, tool_choice="none"
         )
         assert result["content"] == "Response"
 
@@ -768,7 +762,7 @@ class TestToolCalling:
         result = client.chat_completion_with_tools(
             messages=messages,
             tools=sample_tools,
-            tool_choice={"type": "function", "function": {"name": "get_weather"}}
+            tool_choice={"type": "function", "function": {"name": "get_weather"}},
         )
         assert result["content"] == "Response"
 
@@ -783,22 +777,21 @@ class TestToolCalling:
                 "type": "function",
                 "function": {
                     "name": "get_weather",
-                    "arguments": '{"location": "Paris, France"}'
-                }
+                    "arguments": '{"location": "Paris, France"}',
+                },
             },
             {
                 "id": "call_2",
                 "type": "function",
                 "function": {
                     "name": "calculate",
-                    "arguments": '{"expression": "25 + 35"}'
-                }
-            }
+                    "arguments": '{"expression": "25 + 35"}',
+                },
+            },
         ]
 
         result = client.execute_tool_calls(
-            tool_calls=tool_calls,
-            available_functions=sample_functions
+            tool_calls=tool_calls, available_functions=sample_functions
         )
 
         # Verify multiple tool responses
@@ -824,13 +817,12 @@ class TestToolCalling:
             "type": "function",
             "function": {
                 "name": "calculate",
-                "arguments": '{"expression": "invalid expression"}'
-            }
+                "arguments": '{"expression": "invalid expression"}',
+            },
         }
 
         result = client.execute_tool_calls(
-            tool_calls=[tool_call],
-            available_functions=sample_functions
+            tool_calls=[tool_call], available_functions=sample_functions
         )
 
         # Verify error response
@@ -874,13 +866,12 @@ class TestVisionCapabilities:
         mock_instance.chat.complete.return_value = mock_vision_response
 
         client = MistralAIClient(api_key="test_key")
-        
+
         # Use binary data to avoid file path issues
         with patch("base64.b64encode") as mock_b64:
             mock_b64.return_value = b"fake_base64"
             result = client.vision_analysis(
-                image_data=b"fake_image_bytes",
-                prompt="Describe this image"
+                image_data=b"fake_image_bytes", prompt="Describe this image"
             )
 
         assert "content" in result
@@ -917,26 +908,23 @@ class TestVisionCapabilities:
 
         # Test URL format
         result = client.vision_analysis(
-            image_data="https://example.com/image.jpg",
-            prompt="Describe"
+            image_data="https://example.com/image.jpg", prompt="Describe"
         )
         assert result["content"].startswith("This image shows")
 
         # Test file path format - mock both file existence and reading
-        with patch("os.path.exists", return_value=True), \
-             patch("builtins.open", mock_open(read_data=b"fake_image_data")):
-            result = client.vision_analysis(
-                image_data="test.jpg",
-                prompt="Describe"
-            )
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.open", mock_open(read_data=b"fake_image_data")),
+        ):
+            result = client.vision_analysis(image_data="test.jpg", prompt="Describe")
             assert result["content"].startswith("This image shows")
 
         # Test binary data format
         with patch("base64.b64encode") as mock_b64:
             mock_b64.return_value = b"fake_base64"
             result = client.vision_analysis(
-                image_data=b"fake_image_bytes",
-                prompt="Describe"
+                image_data=b"fake_image_bytes", prompt="Describe"
             )
             assert result["content"].startswith("This image shows")
 
@@ -951,12 +939,12 @@ class TestVisionCapabilities:
         # Use binary data to avoid file path issues
         with patch("base64.b64encode") as mock_b64:
             mock_b64.return_value = b"fake_base64"
-            
+
             for detail_level in ["low", "high", "auto"]:
                 result = client.vision_analysis(
                     image_data=b"fake_image_bytes",
                     prompt="Describe",
-                    detail=detail_level
+                    detail=detail_level,
                 )
                 assert result["detail"] == detail_level
                 assert result["content"].startswith("This image shows")
@@ -974,8 +962,7 @@ class TestVisionCapabilities:
         with patch("base64.b64encode") as mock_b64:
             mock_b64.return_value = b"fake_base64"
             result = client.vision_with_text(
-                messages=messages,
-                image_data=b"fake_image_bytes"
+                messages=messages, image_data=b"fake_image_bytes"
             )
 
         assert result["content"].startswith("This image shows")
@@ -1018,10 +1005,11 @@ class TestVisionCapabilities:
         # Use binary data to avoid file path issues
         with patch("base64.b64encode") as mock_b64:
             mock_b64.return_value = b"fake_base64"
-            with pytest.raises(RuntimeError, match="Failed to process multimodal vision request"):
+            with pytest.raises(
+                RuntimeError, match="Failed to process multimodal vision request"
+            ):
                 client.vision_with_text(
-                    [{"role": "user", "content": "test"}],
-                    b"fake_image_bytes"
+                    [{"role": "user", "content": "test"}], b"fake_image_bytes"
                 )
 
     def test_prepare_image_data_validation(self, mock_client):
@@ -1046,8 +1034,10 @@ class TestVisionCapabilities:
         assert result == url
 
         # Test file path (mock both existence and file reading)
-        with patch("os.path.exists", return_value=True), \
-             patch("builtins.open", mock_open(read_data=b"fake_image_data")):
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("builtins.open", mock_open(read_data=b"fake_image_data")),
+        ):
             result = client._prepare_image_data("test.jpg")
             assert result.startswith("data:image/jpeg;base64,")
 

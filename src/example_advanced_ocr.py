@@ -8,12 +8,11 @@ Demonstrates basic and complex OCR capabilities including:
 - Multi-page document processing
 """
 
+import logging
 import os
 import sys
 import time
-import logging
-import textwrap
-from typing import Optional, List, Dict, Any
+from typing import Any
 
 # Add src to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
@@ -78,16 +77,16 @@ def print_ocr_result(title: str, result: str, max_lines: int = 20):
     """Print OCR result with formatting."""
     print(f"\n📋 {title}:")
     print("-" * 60)
-    
+
     lines = result.split('\n')
-    for i, line in enumerate(lines[:max_lines]):
+    for _i, line in enumerate(lines[:max_lines]):
         if line.strip():
             print(f"   {line}")
-    
+
     if len(lines) > max_lines:
         print(f"   ... ({len(lines) - max_lines} more lines)")
-    
-    print(f"\n📊 Statistics:")
+
+    print("\n📊 Statistics:")
     print(f"   • Total lines: {len(lines)}")
     print(f"   • Characters: {len(result)}")
     print(f"   • Words: {len(result.split())}")
@@ -117,7 +116,7 @@ def extract_text_from_pdf_simple(pdf_path: str) -> str:
         # This is a simulation - in production you would use PyPDF2, pdfplumber, etc.
         with open(pdf_path, 'rb') as f:
             content = f.read()
-        
+
         # Simulate extracted text
         file_name = os.path.basename(pdf_path)
         simulated_text = f"""
@@ -138,15 +137,15 @@ def extract_text_from_pdf_simple(pdf_path: str) -> str:
         - Tables and figures (if present)
         - Footnotes and references
         """
-        
+
         return simulated_text
-        
+
     except Exception as e:
         logger.error(f"Failed to extract text from {pdf_path}: {str(e)}")
         return f"Error extracting text: {str(e)}"
 
 
-def extract_text_from_pdf_complex(pdf_path: str) -> Dict[str, Any]:
+def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
     """
     Simulate complex text extraction with layout analysis.
     In production, this would use advanced OCR and layout detection.
@@ -154,10 +153,10 @@ def extract_text_from_pdf_complex(pdf_path: str) -> Dict[str, Any]:
     try:
         with open(pdf_path, 'rb') as f:
             content = f.read()
-        
+
         file_name = os.path.basename(pdf_path)
         file_size = len(content)
-        
+
         # Simulate complex extraction with layout
         simulated_result = {
             'filename': file_name,
@@ -208,9 +207,9 @@ def extract_text_from_pdf_complex(pdf_path: str) -> Dict[str, Any]:
                 'keywords': ['research', 'analysis', 'report']
             }
         }
-        
+
         return simulated_result
-        
+
     except Exception as e:
         logger.error(f"Failed to extract complex text from {pdf_path}: {str(e)}")
         return {
@@ -220,14 +219,14 @@ def extract_text_from_pdf_complex(pdf_path: str) -> Dict[str, Any]:
         }
 
 
-def analyze_document_structure(pdf_path: str) -> Dict[str, Any]:
+def analyze_document_structure(pdf_path: str) -> dict[str, Any]:
     """
     Analyze document structure and layout.
     """
     try:
         file_name = os.path.basename(pdf_path)
         file_size = os.path.getsize(pdf_path)
-        
+
         # Simulate structure analysis
         return {
             'filename': file_name,
@@ -250,7 +249,7 @@ def analyze_document_structure(pdf_path: str) -> Dict[str, Any]:
                 'text_density': 'medium'
             }
         }
-        
+
     except Exception as e:
         logger.error(f"Failed to analyze structure: {str(e)}")
         return {'error': str(e), 'success': False}
@@ -259,18 +258,18 @@ def analyze_document_structure(pdf_path: str) -> Dict[str, Any]:
 def main() -> None:
     """Main function demonstrating advanced OCR workflow."""
     start_time = time.time()
-    
+
     logger.info("Starting advanced OCR example")
-    logger.info(f"Mistral AI Vibe CLI 2.2.1")
-    
+    logger.info("Mistral AI Vibe CLI 2.2.1")
+
     print_header()
-    
+
     # Step 1: Load and validate API key
     print("1️⃣  Loading configuration...")
-    
+
     load_dotenv()
     api_key = os.getenv("MISTRAL_AI_API_KEY")
-    
+
     if not validate_api_key(api_key):
         print_error(
             "MISTRAL_AI_API_KEY not found or invalid",
@@ -278,116 +277,116 @@ def main() -> None:
         )
         logger.error("Invalid API key")
         return
-    
+
     print_success("API key validated")
     logger.info("API key validated successfully")
-    
+
     # Step 2: Initialize clients
     print("\n2️⃣  Initializing clients...")
-    
+
     try:
-        doc_manager = DocumentManager(api_key=api_key)
-        mistral_client = MistralAIClient(api_key=api_key, model="mistral-large-latest")
-        
+        _ = DocumentManager(api_key=api_key)
+        _ = MistralAIClient(api_key=api_key, model="mistral-large-latest")
+
         print_success("Clients initialized successfully")
         logger.info("Clients initialized")
-        
+
     except Exception as e:
         print_error("Failed to initialize clients", str(e))
         logger.error(f"Client initialization failed: {str(e)}")
         return
-    
+
     # Step 3: Basic OCR Example
     print("\n" + "=" * 70)
     print("📄 BASIC OCR EXAMPLE")
     print("=" * 70)
-    
+
     simple_pdf = SAMPLE_PDFS["simple_invoice"]
     print(f"📁 Processing: {os.path.basename(simple_pdf)}")
     print(f"📊 File size: {os.path.getsize(simple_pdf) / 1024:.1f} KB")
-    
+
     try:
         # Simulate uploading document for OCR
         print("🔄 Uploading document for OCR processing...")
-        
+
         # In a real implementation, this would upload to Mistral's OCR endpoint
         # upload_response = doc_manager.upload_document(simple_pdf, purpose="ocr")
         # print_success(f"Document uploaded: {upload_response.filename}")
-        
+
         # Simulate OCR processing
         print("🔍 Performing OCR extraction...")
         ocr_result = extract_text_from_pdf_simple(simple_pdf)
-        
+
         print_ocr_result("Basic OCR Extraction", ocr_result)
         logger.info("Basic OCR completed successfully")
-        
+
     except Exception as e:
         print_error("Basic OCR failed", str(e))
         logger.error(f"Basic OCR failed: {str(e)}")
-    
+
     # Step 4: Complex OCR Example
     print("\n" + "=" * 70)
     print("📊 COMPLEX OCR EXAMPLE")
     print("=" * 70)
-    
+
     complex_pdf = SAMPLE_PDFS["complex_report"]
     print(f"📁 Processing: {os.path.basename(complex_pdf)}")
     print(f"📊 File size: {os.path.getsize(complex_pdf) / (1024*1024):.1f} MB")
-    
+
     try:
         # Analyze document structure first
         print("🔍 Analyzing document structure...")
         structure_analysis = analyze_document_structure(complex_pdf)
-        
-        print(f"\n📐 Document Structure Analysis:")
+
+        print("\n📐 Document Structure Analysis:")
         print("-" * 60)
         print(f"   • Estimated Pages: {structure_analysis['estimated_pages']}")
         print(f"   • Has Tables: {'✅' if structure_analysis['structure']['has_tables'] else '❌'}")
         print(f"   • Has Figures: {'✅' if structure_analysis['structure']['has_figures'] else '❌'}")
         print(f"   • Multi-column Pages: {structure_analysis['layout_analysis']['multi_column_pages']}")
-        
+
         # Perform complex OCR extraction
         print("\n🔄 Performing complex OCR extraction...")
         complex_result = extract_text_from_pdf_complex(complex_pdf)
-        
+
         if 'error' in complex_result:
             print_error("Complex OCR failed", complex_result['error'])
         else:
             print_ocr_result("Complex OCR Extraction", complex_result['text_content'])
-            
-            print(f"\n📊 Additional Analysis:")
+
+            print("\n📊 Additional Analysis:")
             print("-" * 60)
             print(f"   • Tables Detected: {complex_result['tables_detected']}")
             print(f"   • Figures Detected: {complex_result['figures_detected']}")
             print(f"   • Sections Found: {', '.join(complex_result['sections'])}")
-            
+
             logger.info("Complex OCR completed successfully")
-        
+
     except Exception as e:
         print_error("Complex OCR failed", str(e))
         logger.error(f"Complex OCR failed: {str(e)}")
-    
+
     # Step 5: Multi-document Processing
     print("\n" + "=" * 70)
     print("📂 MULTI-DOCUMENT PROCESSING")
     print("=" * 70)
-    
+
     print("Processing multiple documents in batch...")
-    
+
     try:
         documents_to_process = [
             ("Simple Invoice", SAMPLE_PDFS["simple_invoice"]),
             ("Technical Paper", SAMPLE_PDFS["technical_paper"]),
             ("Annual Report", SAMPLE_PDFS["annual_report"])
         ]
-        
+
         batch_results = []
-        
+
         for doc_name, doc_path in documents_to_process:
             print(f"\n📄 Processing: {doc_name}")
             print(f"   File: {os.path.basename(doc_path)}")
             print(f"   Size: {os.path.getsize(doc_path) / 1024:.1f} KB")
-            
+
             # Simulate batch processing
             result = extract_text_from_pdf_simple(doc_path)
             batch_results.append({
@@ -397,46 +396,46 @@ def main() -> None:
                 'status': 'processed',
                 'text_length': len(result)
             })
-            
+
             print(f"   ✅ Processed: {len(result)} characters extracted")
-        
+
         # Summary
-        print(f"\n📊 Batch Processing Summary:")
+        print("\n📊 Batch Processing Summary:")
         print("-" * 60)
         total_chars = sum(r['text_length'] for r in batch_results)
         total_size = sum(r['size'] for r in batch_results) / (1024*1024)
-        
+
         for result in batch_results:
             print(f"   • {result['name']}: {result['text_length']} chars")
-        
+
         print(f"\n   Total Documents: {len(batch_results)}")
         print(f"   Total Characters: {total_chars}")
         print(f"   Total Size: {total_size:.1f} MB")
         print(f"   Average Processing: {total_chars/len(batch_results):.0f} chars/doc")
-        
+
         logger.info(f"Batch processing completed: {len(batch_results)} documents")
-        
+
     except Exception as e:
         print_error("Batch processing failed", str(e))
         logger.error(f"Batch processing failed: {str(e)}")
-    
+
     # Step 6: Document Comparison (Simulated)
     print("\n" + "=" * 70)
     print("🔄 DOCUMENT COMPARISON")
     print("=" * 70)
-    
+
     doc1 = SAMPLE_PDFS["simple_invoice"]
     doc2 = SAMPLE_PDFS["technical_paper"]
-    
-    print(f"Comparing:")
+
+    print("Comparing:")
     print(f"   Doc 1: {os.path.basename(doc1)}")
     print(f"   Doc 2: {os.path.basename(doc2)}")
-    
+
     try:
         # Simulate document comparison
         text1 = extract_text_from_pdf_simple(doc1)
         text2 = extract_text_from_pdf_simple(doc2)
-        
+
         # Simulate comparison analysis
         comparison_result = {
             'doc1_size': len(text1),
@@ -447,8 +446,8 @@ def main() -> None:
             'unique_to_doc1': ['invoice', 'financial', 'transaction'],
             'unique_to_doc2': ['technical', 'paper', 'research', 'algorithm']
         }
-        
-        print(f"\n📊 Comparison Results:")
+
+        print("\n📊 Comparison Results:")
         print("-" * 60)
         print(f"   • Document 1 Size: {comparison_result['doc1_size']} chars")
         print(f"   • Document 2 Size: {comparison_result['doc2_size']} chars")
@@ -457,27 +456,27 @@ def main() -> None:
         print(f"   • Common Terms: {', '.join(comparison_result['common_terms'])}")
         print(f"   • Unique to Doc 1: {', '.join(comparison_result['unique_to_doc1'])}")
         print(f"   • Unique to Doc 2: {', '.join(comparison_result['unique_to_doc2'])}")
-        
+
         logger.info("Document comparison completed")
-        
+
     except Exception as e:
         print_error("Document comparison failed", str(e))
         logger.error(f"Document comparison failed: {str(e)}")
-    
+
     # Summary
     elapsed_time = time.time() - start_time
-    
+
     print("\n" + "=" * 70)
     print("✅ ADVANCED OCR EXAMPLE COMPLETED")
     print("=" * 70)
-    
+
     print("\n📊 Results Summary:")
     print("   • Basic OCR: ✅ Demonstrated")
     print("   • Complex OCR: ✅ Demonstrated")
     print("   • Multi-document Processing: ✅ Demonstrated")
     print("   • Document Comparison: ✅ Demonstrated")
     print(f"   • Execution Time: {elapsed_time:.2f} seconds")
-    
+
     print("\n📚 OCR Capabilities Demonstrated:")
     print("   • Simple text extraction from documents")
     print("   • Complex document analysis with layout preservation")
@@ -486,19 +485,19 @@ def main() -> None:
     print("   • Batch processing of multiple documents")
     print("   • Document structure analysis")
     print("   • Document comparison and similarity analysis")
-    
+
     print("\n💡 Advanced Features:")
     print("   • Layout-aware text extraction")
     print("   • Table structure preservation")
     print("   • Metadata extraction")
     print("   • Multi-document batch processing")
     print("   • Document similarity analysis")
-    
+
     print("\n📖 Resources:")
     print("   • Documentation: docs/ADVANCED_OCR.md")
     print("   • All Examples: python main_examples.py")
     print("   • Mistral AI OCR Guide: https://docs.mistral.ai/ocr")
-    
+
     logger.info(f"Advanced OCR example completed in {elapsed_time:.2f} seconds")
 
 

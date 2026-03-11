@@ -9,12 +9,12 @@ import json
 import logging
 import os
 import time
-from collections.abc import Generator
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable, Generator
+from typing import Any
 
 from dotenv import load_dotenv
 from mistralai import Mistral
-from mistralai.models import Function, Tool, ToolCall
+from mistralai.models import Function
 
 from src.determinism_controller import DeterminismController
 
@@ -98,15 +98,20 @@ class MistralAIClient:
             # Add reasoning instruction to system message or create one
             has_system = any(msg.get("role") == "system" for msg in messages)
             if not has_system:
-                messages.insert(0, {
-                    "role": "system",
-                    "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer."
-                })
+                messages.insert(
+                    0,
+                    {
+                        "role": "system",
+                        "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer.",
+                    },
+                )
             else:
                 # Modify existing system message to include reasoning
                 for msg in messages:
                     if msg.get("role") == "system":
-                        msg["content"] += " Show your reasoning process step by step before providing the final answer."
+                        msg[
+                            "content"
+                        ] += " Show your reasoning process step by step before providing the final answer."
                         break
 
         try:
@@ -280,15 +285,20 @@ class MistralAIClient:
             # Add reasoning instruction to system message or create one
             has_system = any(msg.get("role") == "system" for msg in messages)
             if not has_system:
-                messages.insert(0, {
-                    "role": "system",
-                    "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer."
-                })
+                messages.insert(
+                    0,
+                    {
+                        "role": "system",
+                        "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer.",
+                    },
+                )
             else:
                 # Modify existing system message to include reasoning
                 for msg in messages:
                     if msg.get("role") == "system":
-                        msg["content"] += " Show your reasoning process step by step before providing the final answer."
+                        msg[
+                            "content"
+                        ] += " Show your reasoning process step by step before providing the final answer."
                         break
 
         try:
@@ -428,7 +438,7 @@ class MistralAIClient:
                 messages=messages,
                 tools=tools,
                 tool_choice=tool_choice,
-                **params
+                **params,
             )
 
             duration = time.time() - start_time
@@ -446,14 +456,16 @@ class MistralAIClient:
             tool_calls = []
             if hasattr(message, "tool_calls") and message.tool_calls:
                 for tool_call in message.tool_calls:
-                    tool_calls.append({
-                        "id": tool_call.id,
-                        "type": tool_call.type,
-                        "function": {
-                            "name": tool_call.function.name,
-                            "arguments": tool_call.function.arguments,
-                        },
-                    })
+                    tool_calls.append(
+                        {
+                            "id": tool_call.id,
+                            "type": tool_call.type,
+                            "function": {
+                                "name": tool_call.function.name,
+                                "arguments": tool_call.function.arguments,
+                            },
+                        }
+                    )
 
             # Calculate token usage
             prompt_tokens = (
@@ -540,10 +552,12 @@ class MistralAIClient:
                     "tool_call_id": tool_call_id,
                     "role": "tool",
                     "name": function_name,
-                    "content": json.dumps({
-                        "error": str(e),
-                        "success": False,
-                    }),
+                    "content": json.dumps(
+                        {
+                            "error": str(e),
+                            "success": False,
+                        }
+                    ),
                 }
                 tool_responses.append(error_response)
 
@@ -635,17 +649,21 @@ class MistralAIClient:
 
             # Add tool responses to message history and execution history
             for tool_response in tool_responses:
-                all_messages.append({
-                    "role": "tool",
-                    "content": tool_response["content"],
-                    "tool_call_id": tool_response["tool_call_id"],
-                })
+                all_messages.append(
+                    {
+                        "role": "tool",
+                        "content": tool_response["content"],
+                        "tool_call_id": tool_response["tool_call_id"],
+                    }
+                )
 
-                tool_execution_history.append({
-                    "function": tool_response["name"],
-                    "arguments": json.loads(tool_response["content"]),
-                    "success": "error" not in json.loads(tool_response["content"]),
-                })
+                tool_execution_history.append(
+                    {
+                        "function": tool_response["name"],
+                        "arguments": json.loads(tool_response["content"]),
+                        "success": "error" not in json.loads(tool_response["content"]),
+                    }
+                )
 
         # Get final response (without tools)
         final_response = self.chat_completion_with_tools(
@@ -665,7 +683,7 @@ class MistralAIClient:
             "duration": final_response["duration"],
         }
 
-    def _prepare_image_data(self, image_data: Union[str, bytes]) -> str:
+    def _prepare_image_data(self, image_data: str | bytes) -> str:
         """Prepare image data for vision API.
 
         Args:
@@ -681,7 +699,9 @@ class MistralAIClient:
             raise ValueError("Image data cannot be empty")
 
         # If it's already a URL, return as-is
-        if isinstance(image_data, str) and (image_data.startswith("http://") or image_data.startswith("https://")):
+        if isinstance(image_data, str) and (
+            image_data.startswith("http://") or image_data.startswith("https://")
+        ):
             return image_data
 
         # If it's a file path, read the file
@@ -689,7 +709,7 @@ class MistralAIClient:
             try:
                 with open(image_data, "rb") as image_file:
                     image_data = image_file.read()
-            except IOError as e:
+            except OSError as e:
                 raise ValueError(f"Could not read image file: {str(e)}") from e
 
         # If it's binary data, encode as base64
@@ -700,15 +720,17 @@ class MistralAIClient:
             except Exception as e:
                 raise ValueError(f"Could not encode image data: {str(e)}") from e
 
-        raise ValueError("Unsupported image data format. Provide file path, URL, or binary data.")
+        raise ValueError(
+            "Unsupported image data format. Provide file path, URL, or binary data."
+        )
 
     def vision_analysis(
         self,
-        image_data: Union[str, bytes],
+        image_data: str | bytes,
         prompt: str = "",
         temperature: float | None = None,
         determinism_level: int | None = None,
-        detail: str = "high"
+        detail: str = "high",
     ) -> dict[str, Any]:
         """Analyze images with vision capabilities.
 
@@ -739,7 +761,9 @@ class MistralAIClient:
         # Validate detail level
         valid_detail_levels = ["low", "high", "auto"]
         if detail not in valid_detail_levels:
-            raise ValueError(f"Invalid detail level. Must be one of: {valid_detail_levels}")
+            raise ValueError(
+                f"Invalid detail level. Must be one of: {valid_detail_levels}"
+            )
 
         # Prepare image data
         try:
@@ -772,47 +796,36 @@ class MistralAIClient:
         try:
             # Prepare messages for vision API
             messages = []
-            
+
             # Add system message if there's a prompt
             if prompt:
-                messages.append({
-                    "role": "user",
-                    "content": prompt
-                })
-            
+                messages.append({"role": "user", "content": prompt})
+
             # Add image message
             if prepared_image.startswith("http"):
                 # URL format
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": prepared_image
-                            }
-                        }
-                    ]
-                })
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": prepared_image}}
+                        ],
+                    }
+                )
             else:
                 # Base64 format
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": prepared_image
-                            }
-                        }
-                    ]
-                })
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": prepared_image}}
+                        ],
+                    }
+                )
 
             # Call vision API
             chat_response = self.client.chat.complete(
-                model=self.model,
-                messages=messages,
-                **params
+                model=self.model, messages=messages, **params
             )
 
             duration = time.time() - start_time
@@ -846,20 +859,18 @@ class MistralAIClient:
                 "model": self.model,
                 "level": level,
                 "parameters": params,
-                "detail": detail
+                "detail": detail,
             }
 
         except Exception as e:
-            raise RuntimeError(
-                f"Failed to process vision request: {str(e)}"
-            ) from e
+            raise RuntimeError(f"Failed to process vision request: {str(e)}") from e
 
     def vision_with_text(
         self,
         messages: list[Any],
-        image_data: Union[str, bytes],
+        image_data: str | bytes,
         temperature: float | None = None,
-        determinism_level: int | None = None
+        determinism_level: int | None = None,
     ) -> dict[str, Any]:
         """Multimodal conversation with vision and text.
 
@@ -915,7 +926,7 @@ class MistralAIClient:
         try:
             # Prepare multimodal messages
             multimodal_messages = []
-            
+
             # Add existing text messages
             for message in messages:
                 multimodal_messages.append(message)
@@ -923,36 +934,28 @@ class MistralAIClient:
             # Add image message
             if prepared_image.startswith("http"):
                 # URL format
-                multimodal_messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": prepared_image
-                            }
-                        }
-                    ]
-                })
+                multimodal_messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": prepared_image}}
+                        ],
+                    }
+                )
             else:
                 # Base64 format
-                multimodal_messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": prepared_image
-                            }
-                        }
-                    ]
-                })
+                multimodal_messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "image_url", "image_url": {"url": prepared_image}}
+                        ],
+                    }
+                )
 
             # Call vision API
             chat_response = self.client.chat.complete(
-                model=self.model,
-                messages=multimodal_messages,
-                **params
+                model=self.model, messages=multimodal_messages, **params
             )
 
             duration = time.time() - start_time
@@ -985,7 +988,7 @@ class MistralAIClient:
                 },
                 "model": self.model,
                 "level": level,
-                "parameters": params
+                "parameters": params,
             }
 
         except Exception as e:

@@ -2,8 +2,10 @@
 Test cases for Mistral AI reasoning functionality.
 """
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from src.mistral_client import MistralAIClient
 
 
@@ -35,27 +37,27 @@ class TestReasoning:
         mock_client.return_value.chat.complete.return_value = mock_response
 
         # Test messages without system message
-        messages = [
-            {"role": "user", "content": "What is the capital of France?"}
-        ]
+        messages = [{"role": "user", "content": "What is the capital of France?"}]
 
         result = client.chat_completion(messages, reasoning=True)
 
         # Verify reasoning instruction was added
         call_args = mock_client.return_value.chat.complete.call_args
         actual_messages = call_args[1]["messages"]
-        
+
         # Should have added system message with reasoning instruction
         assert len(actual_messages) == 2
         assert actual_messages[0]["role"] == "system"
         assert "thinks step by step" in actual_messages[0]["content"]
         assert "Show your reasoning process" in actual_messages[0]["content"]
-        
+
         # Verify result contains reasoning output
         assert "Thinking step by step" in result
         assert "Paris" in result
 
-    def test_chat_completion_with_reasoning_and_existing_system(self, client, mock_client):
+    def test_chat_completion_with_reasoning_and_existing_system(
+        self, client, mock_client
+    ):
         """Test reasoning with existing system message."""
         # Setup mock response
         mock_response = MagicMock()
@@ -69,7 +71,7 @@ class TestReasoning:
         # Test messages with existing system message
         messages = [
             {"role": "system", "content": "You are a math assistant."},
-            {"role": "user", "content": "What is the meaning of life?"}
+            {"role": "user", "content": "What is the meaning of life?"},
         ]
 
         result = client.chat_completion(messages, reasoning=True)
@@ -77,13 +79,13 @@ class TestReasoning:
         # Verify reasoning instruction was appended to existing system message
         call_args = mock_client.return_value.chat.complete.call_args
         actual_messages = call_args[1]["messages"]
-        
+
         # Should still have 2 messages, but system message should be modified
         assert len(actual_messages) == 2
         assert actual_messages[0]["role"] == "system"
         assert "You are a math assistant" in actual_messages[0]["content"]
         assert "Show your reasoning process" in actual_messages[0]["content"]
-        
+
         # Verify result
         assert "Reasoning:" in result
 
@@ -98,20 +100,18 @@ class TestReasoning:
         mock_response.choices = [mock_choice]
         mock_client.return_value.chat.complete.return_value = mock_response
 
-        messages = [
-            {"role": "user", "content": "What is the capital of France?"}
-        ]
+        messages = [{"role": "user", "content": "What is the capital of France?"}]
 
         result = client.chat_completion(messages, reasoning=False)
 
         # Verify no reasoning instruction was added
         call_args = mock_client.return_value.chat.complete.call_args
         actual_messages = call_args[1]["messages"]
-        
+
         # Should have original messages only
         assert len(actual_messages) == 1
         assert actual_messages[0]["role"] == "user"
-        
+
         # Verify result is simple answer
         assert result == "Paris"
 
@@ -130,9 +130,7 @@ class TestReasoning:
         mock_response.usage = mock_usage
         mock_client.return_value.chat.complete.return_value = mock_response
 
-        messages = [
-            {"role": "user", "content": "What is the capital of Spain?"}
-        ]
+        messages = [{"role": "user", "content": "What is the capital of Spain?"}]
 
         result = client.chat_completion_with_metrics(messages, reasoning=True)
 
@@ -141,14 +139,14 @@ class TestReasoning:
         assert "duration" in result
         assert "tokens" in result
         assert "reasoning_enabled" in result
-        
+
         # Verify reasoning was enabled
         assert result["reasoning_enabled"] is True
-        
+
         # Verify content contains reasoning
         assert "Thinking" in result["content"]
         assert "Madrid" in result["content"]
-        
+
         # Verify token metrics
         assert result["tokens"]["total"] == 30
         assert result["tokens"]["prompt"] == 10
@@ -165,9 +163,7 @@ class TestReasoning:
         mock_response.choices = [mock_choice]
         mock_client.return_value.chat.complete.return_value = mock_response
 
-        messages = [
-            {"role": "user", "content": "Be creative!"}
-        ]
+        messages = [{"role": "user", "content": "Be creative!"}]
 
         # Test with level 5 (creative)
         result = client.chat_completion(messages, determinism_level=5, reasoning=True)
@@ -175,14 +171,16 @@ class TestReasoning:
         # Verify determinism level was used
         call_args = mock_client.return_value.chat.complete.call_args
         params = call_args[1]
-        
+
         # Should have creative parameters
-        assert params["temperature"] >= 0.7  # Creative level should have high temperature
-        
+        assert (
+            params["temperature"] >= 0.7
+        )  # Creative level should have high temperature
+
         # Verify reasoning instruction was added
         actual_messages = call_args[1]["messages"]
         assert "Show your reasoning process" in actual_messages[0]["content"]
-        
+
         # Verify result
         assert "Reasoning at level 5" in result
 
@@ -200,28 +198,28 @@ class TestReasoning:
         # Original messages
         original_messages = [
             {"role": "system", "content": "Original system message."},
-            {"role": "user", "content": "Original user question?"}
+            {"role": "user", "content": "Original user question?"},
         ]
-        
+
         # Call with reasoning
         result = client.chat_completion(original_messages, reasoning=True)
 
         # Verify API was called with modified messages
         call_args = mock_client.return_value.chat.complete.call_args
         actual_messages = call_args[1]["messages"]
-        
+
         # Should still have 2 messages
         assert len(actual_messages) == 2
         assert actual_messages[0]["role"] == "system"
         assert actual_messages[1]["role"] == "user"
-        
+
         # System message should have reasoning instruction added
         assert "Original system message" in actual_messages[0]["content"]
         assert "Show your reasoning process" in actual_messages[0]["content"]
         assert actual_messages[0]["content"] != "Original system message."
-        
+
         # User message should be unchanged
         assert actual_messages[1]["content"] == "Original user question?"
-        
+
         # Verify result
         assert result == "Reasoned response"

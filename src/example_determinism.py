@@ -4,12 +4,11 @@ Example script demonstrating Mistral AI determinism control.
 Shows how to control response determinism for consistent outputs.
 """
 
+import logging
 import os
 import sys
-import time
-import logging
 import textwrap
-from typing import Optional
+import time
 
 from colorama import Fore, Style, init
 from dotenv import load_dotenv
@@ -24,11 +23,8 @@ from src.utils import format_chat_message, validate_api_key
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('determinism_demo.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("determinism_demo.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
@@ -65,30 +61,31 @@ def print_success(message: str):
 # Import colorama at module level
 init(autoreset=True)
 
+
 def main() -> None:
     """Main function to demonstrate Mistral AI determinism control."""
     start_time = time.time()
-    
+
     logger.info("Starting determinism control example")
-    logger.info(f"Mistral AI Vibe CLI 2.2.1")
+    logger.info("Mistral AI Vibe CLI 2.2.1")
     logger.info(f"Python {sys.version.split()[0]}")
-    
+
     print_header()
 
     # Step 1: Load and validate API key
     print("1️⃣  Loading configuration...")
-    
+
     load_dotenv()
     api_key = os.getenv("MISTRAL_AI_API_KEY")
 
     if not validate_api_key(api_key):
         print_error(
             "MISTRAL_AI_API_KEY not found or invalid",
-            "Please set a valid API key in .env file"
+            "Please set a valid API key in .env file",
         )
         logger.error("Invalid API key")
         return
-    
+
     print_success("API key validated")
     logger.info("API key validated successfully")
 
@@ -457,8 +454,12 @@ def main() -> None:
         print("-" * 80)
         print("💡 Shows thinking process even for exact answers")
         print("💬 Question: What is the capital of France?")
-        response_reasoning = client.chat_completion(messages, determinism_level=1, reasoning=True)
-        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        response_reasoning = client.chat_completion(
+            messages, determinism_level=1, reasoning=True
+        )
+        wrapped_response = textwrap.fill(
+            response_reasoning, width=80, subsequent_indent="    "
+        )
         print(f"🤖 Thinking and final answer:\n{wrapped_response}")
 
         # Test level 3 (balanced - default)
@@ -474,8 +475,12 @@ def main() -> None:
         print("-" * 80)
         print("💡 Shows balanced thinking process")
         print("💬 Question: What is the capital of France?")
-        response_reasoning = client.chat_completion(messages, determinism_level=3, reasoning=True)
-        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        response_reasoning = client.chat_completion(
+            messages, determinism_level=3, reasoning=True
+        )
+        wrapped_response = textwrap.fill(
+            response_reasoning, width=80, subsequent_indent="    "
+        )
         print(f"🤖 Thinking and balanced answer:\n{wrapped_response}")
 
         # Test level 5 (most creative)
@@ -491,8 +496,12 @@ def main() -> None:
         print("-" * 80)
         print("💡 Shows creative thinking process")
         print("💬 Question: What is the capital of France?")
-        response_reasoning = client.chat_completion(messages, determinism_level=5, reasoning=True)
-        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        response_reasoning = client.chat_completion(
+            messages, determinism_level=5, reasoning=True
+        )
+        wrapped_response = textwrap.fill(
+            response_reasoning, width=80, subsequent_indent="    "
+        )
         print(f"🤖 Creative thinking and answer:\n{wrapped_response}")
 
         # Test with custom temperature (overrides level)
@@ -577,11 +586,11 @@ def main() -> None:
     print("  ✅ Highlighted reasoning output with 🧠 and 🤖 emojis")
     # Final summary
     elapsed_time = time.time() - start_time
-    
+
     print("\n" + "=" * 60)
     print("✅ DETERMINISM EXAMPLE COMPLETED")
     print("=" * 60)
-    
+
     print("\n📊 Results:")
     print("   • Determinism levels tested: 1-5")
     print("   • Dynamic level switching: ✅")
@@ -589,20 +598,20 @@ def main() -> None:
     print("   • Model compatibility: ✅")
     print("   • Reasoning mode demonstrations: ✅")
     print(f"   • Execution time: {elapsed_time:.2f} seconds")
-    
+
     print("\n📚 Level Guide:")
     print("   Level 1: Exact answers, minimal variation")
     print("   Level 2: Focused responses, low creativity")
     print("   Level 3: Balanced (default), good mix")
     print("   Level 4: Creative responses, more variation")
     print("   Level 5: Highly creative, maximum variation")
-    
+
     print("\n🧠 Reasoning Mode:")
     print("   • Shows AI thinking process step-by-step")
     print("   • Use reasoning=True parameter to enable")
     print("   • Works with all determinism levels")
     print("   • Provides transparency in AI decision making")
-    
+
     print("\n💡 Best Practices:")
     print("   • Use Level 1-2 for factual answers")
     print("   • Use Level 3 for general conversation")
@@ -610,13 +619,13 @@ def main() -> None:
     print("   • Enable reasoning for complex or critical decisions")
     print("   • Adjust dynamically based on context")
     print("   • Use reasoning to debug or understand AI behavior")
-    
+
     print("\n📖 Resources:")
     print("   • Documentation: docs/API_INTEGRATION.md")
     print("   • All Examples: python main_examples.py")
     print("   • Mistral AI: https://mistral.ai")
     print("   • Reasoning Guide: docs/ADVANCED_FEATURES.md")
-    
+
     logger.info(f"Determinism example completed in {elapsed_time:.2f} seconds")
     logger.info("All determinism levels tested successfully")
 
