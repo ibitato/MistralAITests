@@ -26,11 +26,8 @@ from src.mistral_client import MistralAIClient
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('advanced_ocr.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("advanced_ocr.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
@@ -43,7 +40,7 @@ SAMPLE_PDFS = {
     "simple_invoice": "test_docs/r1200appendix_d.pdf",  # Smaller, simpler document
     "complex_report": "test_docs/cihi-annual-report-2024-2025-en.pdf",  # Large complex report
     "technical_paper": "test_docs/1805.04770.pdf",  # Technical paper with tables
-    "annual_report": "test_docs/edc-2024-annual-report.pdf"  # Large annual report
+    "annual_report": "test_docs/edc-2024-annual-report.pdf",  # Large annual report
 }
 
 
@@ -78,7 +75,7 @@ def print_ocr_result(title: str, result: str, max_lines: int = 20):
     print(f"\n📋 {title}:")
     print("-" * 60)
 
-    lines = result.split('\n')
+    lines = result.split("\n")
     for _i, line in enumerate(lines[:max_lines]):
         if line.strip():
             print(f"   {line}")
@@ -114,7 +111,7 @@ def extract_text_from_pdf_simple(pdf_path: str) -> str:
     """
     try:
         # This is a simulation - in production you would use PyPDF2, pdfplumber, etc.
-        with open(pdf_path, 'rb') as f:
+        with open(pdf_path, "rb") as f:
             content = f.read()
 
         # Simulate extracted text
@@ -151,7 +148,7 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
     In production, this would use advanced OCR and layout detection.
     """
     try:
-        with open(pdf_path, 'rb') as f:
+        with open(pdf_path, "rb") as f:
             content = f.read()
 
         file_name = os.path.basename(pdf_path)
@@ -159,10 +156,10 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
 
         # Simulate complex extraction with layout
         simulated_result = {
-            'filename': file_name,
-            'size_bytes': file_size,
-            'pages': min(50, file_size // 10000),  # Simulate page count
-            'text_content': f"""
+            "filename": file_name,
+            "size_bytes": file_size,
+            "pages": min(50, file_size // 10000),  # Simulate page count
+            "text_content": f"""
             COMPLEX OCR EXTRACTION: {file_name}
             ==================================
             
@@ -198,14 +195,14 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
             ---------------------
             In summary, the analysis demonstrates...
             """,
-            'tables_detected': 3,
-            'figures_detected': 2,
-            'sections': ['Introduction', 'Methodology', 'Results', 'Conclusion'],
-            'metadata': {
-                'author': 'Simulated Author',
-                'creation_date': '2024-01-15',
-                'keywords': ['research', 'analysis', 'report']
-            }
+            "tables_detected": 3,
+            "figures_detected": 2,
+            "sections": ["Introduction", "Methodology", "Results", "Conclusion"],
+            "metadata": {
+                "author": "Simulated Author",
+                "creation_date": "2024-01-15",
+                "keywords": ["research", "analysis", "report"],
+            },
         }
 
         return simulated_result
@@ -213,9 +210,9 @@ def extract_text_from_pdf_complex(pdf_path: str) -> dict[str, Any]:
     except Exception as e:
         logger.error(f"Failed to extract complex text from {pdf_path}: {str(e)}")
         return {
-            'error': str(e),
-            'filename': os.path.basename(pdf_path),
-            'success': False
+            "error": str(e),
+            "filename": os.path.basename(pdf_path),
+            "success": False,
         }
 
 
@@ -229,30 +226,30 @@ def analyze_document_structure(pdf_path: str) -> dict[str, Any]:
 
         # Simulate structure analysis
         return {
-            'filename': file_name,
-            'file_size': file_size,
-            'document_type': 'PDF',
-            'estimated_pages': max(1, file_size // 50000),
-            'structure': {
-                'has_table_of_contents': True,
-                'has_headers_footers': True,
-                'has_page_numbers': True,
-                'has_tables': True,
-                'has_figures': True,
-                'has_footnotes': True,
-                'has_references': True
+            "filename": file_name,
+            "file_size": file_size,
+            "document_type": "PDF",
+            "estimated_pages": max(1, file_size // 50000),
+            "structure": {
+                "has_table_of_contents": True,
+                "has_headers_footers": True,
+                "has_page_numbers": True,
+                "has_tables": True,
+                "has_figures": True,
+                "has_footnotes": True,
+                "has_references": True,
             },
-            'layout_analysis': {
-                'single_column_pages': 80,
-                'multi_column_pages': 15,
-                'full_page_images': 5,
-                'text_density': 'medium'
-            }
+            "layout_analysis": {
+                "single_column_pages": 80,
+                "multi_column_pages": 15,
+                "full_page_images": 5,
+                "text_density": "medium",
+            },
         }
 
     except Exception as e:
         logger.error(f"Failed to analyze structure: {str(e)}")
-        return {'error': str(e), 'success': False}
+        return {"error": str(e), "success": False}
 
 
 def main() -> None:
@@ -273,7 +270,7 @@ def main() -> None:
     if not validate_api_key(api_key):
         print_error(
             "MISTRAL_AI_API_KEY not found or invalid",
-            "Please set a valid API key in .env file"
+            "Please set a valid API key in .env file",
         )
         logger.error("Invalid API key")
         return
@@ -341,18 +338,24 @@ def main() -> None:
         print("\n📐 Document Structure Analysis:")
         print("-" * 60)
         print(f"   • Estimated Pages: {structure_analysis['estimated_pages']}")
-        print(f"   • Has Tables: {'✅' if structure_analysis['structure']['has_tables'] else '❌'}")
-        print(f"   • Has Figures: {'✅' if structure_analysis['structure']['has_figures'] else '❌'}")
-        print(f"   • Multi-column Pages: {structure_analysis['layout_analysis']['multi_column_pages']}")
+        print(
+            f"   • Has Tables: {'✅' if structure_analysis['structure']['has_tables'] else '❌'}"
+        )
+        print(
+            f"   • Has Figures: {'✅' if structure_analysis['structure']['has_figures'] else '❌'}"
+        )
+        print(
+            f"   • Multi-column Pages: {structure_analysis['layout_analysis']['multi_column_pages']}"
+        )
 
         # Perform complex OCR extraction
         print("\n🔄 Performing complex OCR extraction...")
         complex_result = extract_text_from_pdf_complex(complex_pdf)
 
-        if 'error' in complex_result:
-            print_error("Complex OCR failed", complex_result['error'])
+        if "error" in complex_result:
+            print_error("Complex OCR failed", complex_result["error"])
         else:
-            print_ocr_result("Complex OCR Extraction", complex_result['text_content'])
+            print_ocr_result("Complex OCR Extraction", complex_result["text_content"])
 
             print("\n📊 Additional Analysis:")
             print("-" * 60)
@@ -377,7 +380,7 @@ def main() -> None:
         documents_to_process = [
             ("Simple Invoice", SAMPLE_PDFS["simple_invoice"]),
             ("Technical Paper", SAMPLE_PDFS["technical_paper"]),
-            ("Annual Report", SAMPLE_PDFS["annual_report"])
+            ("Annual Report", SAMPLE_PDFS["annual_report"]),
         ]
 
         batch_results = []
@@ -389,21 +392,23 @@ def main() -> None:
 
             # Simulate batch processing
             result = extract_text_from_pdf_simple(doc_path)
-            batch_results.append({
-                'name': doc_name,
-                'file': os.path.basename(doc_path),
-                'size': os.path.getsize(doc_path),
-                'status': 'processed',
-                'text_length': len(result)
-            })
+            batch_results.append(
+                {
+                    "name": doc_name,
+                    "file": os.path.basename(doc_path),
+                    "size": os.path.getsize(doc_path),
+                    "status": "processed",
+                    "text_length": len(result),
+                }
+            )
 
             print(f"   ✅ Processed: {len(result)} characters extracted")
 
         # Summary
         print("\n📊 Batch Processing Summary:")
         print("-" * 60)
-        total_chars = sum(r['text_length'] for r in batch_results)
-        total_size = sum(r['size'] for r in batch_results) / (1024*1024)
+        total_chars = sum(r["text_length"] for r in batch_results)
+        total_size = sum(r["size"] for r in batch_results) / (1024 * 1024)
 
         for result in batch_results:
             print(f"   • {result['name']}: {result['text_length']} chars")
@@ -438,13 +443,13 @@ def main() -> None:
 
         # Simulate comparison analysis
         comparison_result = {
-            'doc1_size': len(text1),
-            'doc2_size': len(text2),
-            'size_difference': abs(len(text1) - len(text2)),
-            'similarity_score': 0.15,  # Simulated low similarity
-            'common_terms': ['document', 'analysis', 'content'],
-            'unique_to_doc1': ['invoice', 'financial', 'transaction'],
-            'unique_to_doc2': ['technical', 'paper', 'research', 'algorithm']
+            "doc1_size": len(text1),
+            "doc2_size": len(text2),
+            "size_difference": abs(len(text1) - len(text2)),
+            "similarity_score": 0.15,  # Simulated low similarity
+            "common_terms": ["document", "analysis", "content"],
+            "unique_to_doc1": ["invoice", "financial", "transaction"],
+            "unique_to_doc2": ["technical", "paper", "research", "algorithm"],
         }
 
         print("\n📊 Comparison Results:")
@@ -452,7 +457,9 @@ def main() -> None:
         print(f"   • Document 1 Size: {comparison_result['doc1_size']} chars")
         print(f"   • Document 2 Size: {comparison_result['doc2_size']} chars")
         print(f"   • Size Difference: {comparison_result['size_difference']} chars")
-        print(f"   • Similarity Score: {comparison_result['similarity_score']*100:.1f}%")
+        print(
+            f"   • Similarity Score: {comparison_result['similarity_score']*100:.1f}%"
+        )
         print(f"   • Common Terms: {', '.join(comparison_result['common_terms'])}")
         print(f"   • Unique to Doc 1: {', '.join(comparison_result['unique_to_doc1'])}")
         print(f"   • Unique to Doc 2: {', '.join(comparison_result['unique_to_doc2'])}")
