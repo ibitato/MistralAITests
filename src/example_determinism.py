@@ -216,6 +216,27 @@ def main() -> None:
     except Exception as e:
         print(f"❌ Error with creative client: {e}")
 
+    # Test with creative client + REASONING
+    print("\n🧠 Testing creative client with REASONING:")
+    print("-" * 80)
+    print("💡 Reasoning mode shows the AI's thinking process before final answer")
+    creative_messages_reasoning = [
+        {"role": "system", "content": "You are a creative AI assistant."},
+        {"role": "user", "content": "Write a short poem about Paris."},
+    ]
+    print(f"💬 System: {creative_messages_reasoning[0]['content']}")
+    print(f"💬 User: {creative_messages_reasoning[1]['content']}")
+    try:
+        creative_response_reasoning = creative_client.chat_completion(
+            creative_messages_reasoning, reasoning=True
+        )
+        wrapped_response = textwrap.fill(
+            creative_response_reasoning, width=80, subsequent_indent="    "
+        )
+        print(f"🤖 Thinking process and final response:\n{wrapped_response}")
+    except Exception as e:
+        print(f"❌ Error with creative client reasoning: {e}")
+
     # Test with exact client
     print("\n🎯 Testing exact client:")
     print("-" * 80)
@@ -233,6 +254,27 @@ def main() -> None:
         print(f"💬 Exact response: {wrapped_response}")
     except Exception as e:
         print(f"❌ Error with exact client: {e}")
+
+    # Test with exact client + REASONING
+    print("\n🧠 Testing exact client with REASONING:")
+    print("-" * 80)
+    print("💡 Reasoning mode shows step-by-step thinking even for factual questions")
+    exact_messages_reasoning = [
+        {"role": "system", "content": "You are a precise AI assistant."},
+        {"role": "user", "content": "What is the exact capital of France?"},
+    ]
+    print(f"💬 System: {exact_messages_reasoning[0]['content']}")
+    print(f"💬 User: {exact_messages_reasoning[1]['content']}")
+    try:
+        exact_response_reasoning = exact_client.chat_completion(
+            exact_messages_reasoning, reasoning=True
+        )
+        wrapped_response = textwrap.fill(
+            exact_response_reasoning, width=80, subsequent_indent="    "
+        )
+        print(f"🤖 Thinking process and final answer:\n{wrapped_response}")
+    except Exception as e:
+        print(f"❌ Error with exact client reasoning: {e}")
 
     # Test with balanced client (default)
     print("\n⚖️ Testing balanced client (default):")
@@ -270,6 +312,31 @@ def main() -> None:
         except Exception as fallback_e:
             print(f"❌ Error with fallback client: {fallback_e}")
             print("🔴 Unable to complete balanced client test")
+
+    # Test with balanced client + REASONING
+    print("\n🧠 Testing balanced client with REASONING:")
+    print("-" * 80)
+    print("💡 Reasoning mode provides detailed thinking before balanced response")
+    balanced_messages_reasoning = [
+        {"role": "system", "content": "You are a balanced AI assistant."},
+        {"role": "user", "content": "Tell me about the Eiffel Tower."},
+    ]
+    print(f"💬 System: {balanced_messages_reasoning[0]['content']}")
+    print(f"💬 User: {balanced_messages_reasoning[1]['content']}")
+    print("🔄 Processing with reasoning...")
+    try:
+        balanced_response_reasoning = client.chat_completion(
+            balanced_messages_reasoning, reasoning=True
+        )
+        if balanced_response_reasoning:
+            wrapped_response = textwrap.fill(
+                balanced_response_reasoning, width=80, subsequent_indent="    "
+            )
+            print(f"🤖 Thinking process and balanced response:\n{wrapped_response}")
+        else:
+            print("⚠️  Empty response received from API")
+    except Exception as e:
+        print(f"❌ Error with balanced client reasoning: {e}")
 
     # Test streaming functionality
     print("\n🌊 Testing streaming functionality:")
@@ -385,6 +452,15 @@ def main() -> None:
         wrapped_response = textwrap.fill(response, width=80, subsequent_indent="    ")
         print(f"💬 Response: {wrapped_response}")
 
+        # Test level 1 with REASONING
+        print("\n🧠 Level 1 (Exact) with REASONING:")
+        print("-" * 80)
+        print("💡 Shows thinking process even for exact answers")
+        print("💬 Question: What is the capital of France?")
+        response_reasoning = client.chat_completion(messages, determinism_level=1, reasoning=True)
+        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        print(f"🤖 Thinking and final answer:\n{wrapped_response}")
+
         # Test level 3 (balanced - default)
         print("\n⚖️ Level 3 (Balanced - default):")
         print("-" * 80)
@@ -393,6 +469,15 @@ def main() -> None:
         wrapped_response = textwrap.fill(response, width=80, subsequent_indent="    ")
         print(f"💬 Response: {wrapped_response}")
 
+        # Test level 3 with REASONING
+        print("\n🧠 Level 3 (Balanced) with REASONING:")
+        print("-" * 80)
+        print("💡 Shows balanced thinking process")
+        print("💬 Question: What is the capital of France?")
+        response_reasoning = client.chat_completion(messages, determinism_level=3, reasoning=True)
+        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        print(f"🤖 Thinking and balanced answer:\n{wrapped_response}")
+
         # Test level 5 (most creative)
         print("\n🎨 Level 5 (Creative):")
         print("-" * 80)
@@ -400,6 +485,15 @@ def main() -> None:
         response = client.chat_completion(messages, determinism_level=5)
         wrapped_response = textwrap.fill(response, width=80, subsequent_indent="    ")
         print(f"💬 Response: {wrapped_response}")
+
+        # Test level 5 with REASONING
+        print("\n🧠 Level 5 (Creative) with REASONING:")
+        print("-" * 80)
+        print("💡 Shows creative thinking process")
+        print("💬 Question: What is the capital of France?")
+        response_reasoning = client.chat_completion(messages, determinism_level=5, reasoning=True)
+        wrapped_response = textwrap.fill(response_reasoning, width=80, subsequent_indent="    ")
+        print(f"🤖 Creative thinking and answer:\n{wrapped_response}")
 
         # Test with custom temperature (overrides level)
         print("\n🌡️ Custom temperature (overrides level):")
@@ -477,6 +571,10 @@ def main() -> None:
     print("  ✅ Successfully tested all determinism levels")
     print("  ✅ Demonstrated dynamic level switching")
     print("  ✅ Showed error handling for invalid levels")
+    print("  ✅ Added reasoning mode demonstrations")
+    print("  ✅ Showed reasoning with all determinism levels")
+    print("  ✅ Duplicated examples with reasoning mode")
+    print("  ✅ Highlighted reasoning output with 🧠 and 🤖 emojis")
     # Final summary
     elapsed_time = time.time() - start_time
     
@@ -489,6 +587,7 @@ def main() -> None:
     print("   • Dynamic level switching: ✅")
     print("   • Error handling: ✅")
     print("   • Model compatibility: ✅")
+    print("   • Reasoning mode demonstrations: ✅")
     print(f"   • Execution time: {elapsed_time:.2f} seconds")
     
     print("\n📚 Level Guide:")
@@ -498,16 +597,25 @@ def main() -> None:
     print("   Level 4: Creative responses, more variation")
     print("   Level 5: Highly creative, maximum variation")
     
+    print("\n🧠 Reasoning Mode:")
+    print("   • Shows AI thinking process step-by-step")
+    print("   • Use reasoning=True parameter to enable")
+    print("   • Works with all determinism levels")
+    print("   • Provides transparency in AI decision making")
+    
     print("\n💡 Best Practices:")
     print("   • Use Level 1-2 for factual answers")
     print("   • Use Level 3 for general conversation")
     print("   • Use Level 4-5 for creative writing")
+    print("   • Enable reasoning for complex or critical decisions")
     print("   • Adjust dynamically based on context")
+    print("   • Use reasoning to debug or understand AI behavior")
     
     print("\n📖 Resources:")
     print("   • Documentation: docs/API_INTEGRATION.md")
     print("   • All Examples: python main_examples.py")
     print("   • Mistral AI: https://mistral.ai")
+    print("   • Reasoning Guide: docs/ADVANCED_FEATURES.md")
     
     logger.info(f"Determinism example completed in {elapsed_time:.2f} seconds")
     logger.info("All determinism levels tested successfully")

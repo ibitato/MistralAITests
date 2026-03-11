@@ -52,6 +52,7 @@ class MistralAIClient:
         messages: list[Any],
         temperature: float | None = None,
         determinism_level: int | None = None,
+        reasoning: bool = False,
     ) -> str:
         """Get chat completion from Mistral AI.
 
@@ -59,9 +60,10 @@ class MistralAIClient:
             messages: List of chat messages
             temperature: Temperature for completion (0.0 to 1.0), optional
             determinism_level: Determinism level (1-5), optional
+            reasoning: Enable reasoning mode to show thinking process, optional
 
         Returns:
-            Completion text
+            Completion text (includes reasoning steps if reasoning=True)
 
         Raises:
             ValueError: If messages are empty or invalid
@@ -90,6 +92,22 @@ class MistralAIClient:
             # When temperature is 0 (greedy sampling), Mistral API requires top_p=1
             if temperature == 0.0:
                 params["top_p"] = 1.0
+
+        # Add reasoning prompt if enabled
+        if reasoning:
+            # Add reasoning instruction to system message or create one
+            has_system = any(msg.get("role") == "system" for msg in messages)
+            if not has_system:
+                messages.insert(0, {
+                    "role": "system",
+                    "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer."
+                })
+            else:
+                # Modify existing system message to include reasoning
+                for msg in messages:
+                    if msg.get("role") == "system":
+                        msg["content"] += " Show your reasoning process step by step before providing the final answer."
+                        break
 
         try:
             chat_response = self.client.chat.complete(
@@ -207,6 +225,7 @@ class MistralAIClient:
         messages: list[Any],
         temperature: float | None = None,
         determinism_level: int | None = None,
+        reasoning: bool = False,
     ) -> dict[str, Any]:
         """Get chat completion with performance metrics.
 
@@ -214,15 +233,17 @@ class MistralAIClient:
             messages: List of chat messages
             temperature: Temperature for completion (0.0 to 1.0), optional
             determinism_level: Determinism level (1-5), optional
+            reasoning: Enable reasoning mode to show thinking process, optional
 
         Returns:
             Dictionary containing:
-            - content: The response text
+            - content: The response text (includes reasoning if enabled)
             - duration: Request duration in seconds
             - tokens: Total tokens used (input + output)
             - model: Model used
             - level: Determinism level used
             - metrics: Additional performance metrics
+            - reasoning_enabled: Whether reasoning was used
 
         Raises:
             ValueError: If messages are empty or invalid
@@ -253,6 +274,22 @@ class MistralAIClient:
             # When temperature is 0 (greedy sampling), Mistral API requires top_p=1
             if temperature == 0.0:
                 params["top_p"] = 1.0
+
+        # Add reasoning prompt if enabled
+        if reasoning:
+            # Add reasoning instruction to system message or create one
+            has_system = any(msg.get("role") == "system" for msg in messages)
+            if not has_system:
+                messages.insert(0, {
+                    "role": "system",
+                    "content": "You are a helpful AI assistant that thinks step by step. Show your reasoning process before providing the final answer."
+                })
+            else:
+                # Modify existing system message to include reasoning
+                for msg in messages:
+                    if msg.get("role") == "system":
+                        msg["content"] += " Show your reasoning process step by step before providing the final answer."
+                        break
 
         try:
             chat_response = self.client.chat.complete(
@@ -291,6 +328,7 @@ class MistralAIClient:
                     "tokens_per_second": total_tokens / duration if duration > 0 else 0,
                     "response_time_ms": duration * 1000,
                 },
+                "reasoning_enabled": reasoning,
             }
 
         except Exception as e:
